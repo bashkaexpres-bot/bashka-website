@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bashka Express — Driver Application</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --orange:#E85D04;--orange-dark:#9C4100;--orange-light:#FFF3E0;
+  --steel:#1A1F2E;--steel-mid:#2C3347;
+  --gray-100:#F5F5F5;--gray-200:#E8E8E8;--gray-400:#9E9E9E;--gray-600:#616161;--gray-800:#212121;
+  --green:#2E7D32;--green-bg:#E8F5E9;--red:#C62828;
+  --radius:6px;
+}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--gray-100);color:var(--gray-800);font-size:14px;min-height:100vh;padding:20px}
+.wrap{max-width:640px;margin:0 auto}
+.header{background:var(--steel);border-radius:10px 10px 0 0;padding:20px 24px;color:#fff}
+.header h1{font-size:18px;font-weight:500}
+.header p{font-size:12px;color:#9AA3B8;margin-top:2px}
+.card{background:#fff;border-radius:0 0 10px 10px;padding:24px;box-shadow:0 2px 10px rgba(0,0,0,0.06)}
+.section{margin-bottom:24px}
+.section-title{font-size:14px;font-weight:600;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--gray-200)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+.form-label{font-size:11px;color:var(--gray-600);font-weight:500;text-transform:uppercase;letter-spacing:0.5px}
+.form-input,.form-select,textarea{border:1px solid var(--gray-200);border-radius:var(--radius);padding:9px 10px;font-size:13px;font-family:inherit;outline:none;width:100%}
+.form-input:focus,textarea:focus{border-color:var(--orange)}
+textarea{resize:vertical;min-height:60px}
+.hist-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center}
+.hist-row input{font-size:12px;padding:7px 8px}
+.btn-add{background:none;border:1px dashed var(--gray-400);border-radius:var(--radius);padding:8px;font-size:12px;color:var(--gray-600);cursor:pointer;width:100%}
+.btn-remove{background:none;border:none;color:var(--red);cursor:pointer;font-size:16px;padding:4px}
+.radio-row{display:flex;gap:16px;align-items:center}
+.radio-row label{display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer}
+canvas#sig-pad{border:1px solid var(--gray-200);border-radius:var(--radius);background:#fdfdfd;touch-action:none;width:100%;height:150px;cursor:crosshair}
+.sig-actions{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.btn-clear{background:none;border:none;color:var(--gray-600);font-size:12px;cursor:pointer;text-decoration:underline}
+.consent{font-size:11px;color:var(--gray-600);margin:14px 0;line-height:1.5}
+.btn-submit{width:100%;background:var(--orange);border:none;border-radius:var(--radius);padding:13px;font-size:14px;font-weight:500;cursor:pointer;color:#fff}
+.btn-submit:hover{background:var(--orange-dark)}
+.btn-submit:disabled{opacity:0.6;cursor:not-allowed}
+.error{color:var(--red);font-size:12px;margin-top:8px;display:none}
+.success-screen{text-align:center;padding:60px 24px}
+.success-icon{font-size:48px;margin-bottom:16px}
+.required::after{content:" *";color:var(--red)}
+@media(max-width:520px){.form-grid{grid-template-columns:1fr}.hist-row{grid-template-columns:1fr;gap:4px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <h1>🚛 Bashka Express — Driver Application</h1>
+    <p>Please complete all required fields and sign at the bottom</p>
+  </div>
+  <div class="card" id="form-card">
+    <div id="loading-msg" style="text-align:center;padding:40px;color:var(--gray-400)">Loading application...</div>
+    <form id="app-form" style="display:none">
+
+      <div class="section">
+        <div class="section-title">Personal information</div>
+        <div class="form-grid">
+          <div class="form-group full"><label class="form-label required">Full name</label><input class="form-input" id="f-name" required></div>
+          <div class="form-group"><label class="form-label required">Phone</label><input class="form-input" id="f-phone" type="tel" required></div>
+          <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="f-email" type="email"></div>
+          <div class="form-group full"><label class="form-label required">Address</label><input class="form-input" id="f-address" required></div>
+          <div class="form-group"><label class="form-label required">Date of birth</label><input class="form-input" id="f-dob" type="date" required></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">License information</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label required">License number</label><input class="form-input" id="f-license" required></div>
+          <div class="form-group"><label class="form-label required">License state</label><input class="form-input" id="f-license-state" maxlength="2" placeholder="e.g. MN" required></div>
+          <div class="form-group full"><label class="form-label">CDL class / endorsements</label><input class="form-input" id="f-cdl"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Employment history (last 3 years)</div>
+        <div id="employment-rows"></div>
+        <button type="button" class="btn-add" onclick="addEmploymentRow()">+ Add employer</button>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Driving record</div>
+        <div class="form-group full" style="margin-bottom:10px">
+          <label class="form-label">Accidents in the last 3 years (if any)</label>
+          <textarea id="f-accidents" placeholder="Date, description, injuries — or write 'None'"></textarea>
+        </div>
+        <div class="form-group full" style="margin-bottom:10px">
+          <label class="form-label">Traffic violations in the last 3 years (if any)</label>
+          <textarea id="f-violations" placeholder="Date, description — or write 'None'"></textarea>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">License suspension, denial, or revocation</label>
+          <div class="radio-row" style="margin-top:4px">
+            <label><input type="radio" name="license-action" value="none" checked> None</label>
+            <label><input type="radio" name="license-action" value="yes"> Yes (explain below)</label>
+          </div>
+          <textarea id="f-license-action-detail" placeholder="Explain circumstances" style="margin-top:8px;display:none"></textarea>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Signature</div>
+        <p style="font-size:12px;color:var(--gray-600);margin-bottom:8px">Sign using your mouse or finger below</p>
+        <canvas id="sig-pad"></canvas>
+        <div class="sig-actions">
+          <button type="button" class="btn-clear" onclick="clearSignature()">Clear signature</button>
+          <span id="sig-status" style="font-size:11px;color:var(--gray-400)">Not signed</span>
+        </div>
+        <div class="form-group full" style="margin-top:12px">
+          <label class="form-label required">Type your full legal name to confirm signature</label>
+          <input class="form-input" id="f-signed-name" required>
+        </div>
+      </div>
+
+      <div class="consent">
+        By signing above, I certify that the information provided in this application is true and complete to the best of my knowledge. I understand that any false statements may be grounds for termination.
+      </div>
+
+      <div class="error" id="form-error"></div>
+      <button type="submit" class="btn-submit" id="submit-btn">Submit application</button>
+    </form>
+
+    <div id="success-screen" class="success-screen" style="display:none">
+      <div class="success-icon">✅</div>
+      <h2>Application submitted</h2>
+      <p style="color:var(--gray-600);margin-top:8px">Thank you — your application has been received.</p>
+    </div>
+
+    <div id="invalid-screen" style="display:none;text-align:center;padding:60px 24px;color:var(--gray-600)">
+      This application link is invalid or has already been used.
+    </div>
+  </div>
+</div>
+
+<script>
+const SB_URL = 'https://ghrbrwusfyjprxhivxfo.supabase.co';
+const SB_KEY = 'sb_publishable_NAFw4krk8evjh7Bx0VFD9g_EcuThMES';
+const H = {'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
+
+const params = new URLSearchParams(window.location.search);
+let token = params.get('token');
+
+let hasSignature = false;
+
+// --- Employment history rows ---
+let empCount = 0;
+function addEmploymentRow(){
+  empCount++;
+  const div = document.createElement('div');
+  div.className = 'hist-row';
+  div.id = `emp-row-${empCount}`;
+  div.innerHTML = `
+    <input class="form-input" placeholder="Employer name" data-field="employer">
+    <input class="form-input" placeholder="Position">
+    <input class="form-input" type="date" placeholder="Start" data-field="start_date">
+    <input class="form-input" type="date" placeholder="End" data-field="end_date">
+    <button type="button" class="btn-remove" onclick="document.getElementById('emp-row-${empCount}').remove()">✕</button>
+  `;
+  document.getElementById('employment-rows').appendChild(div);
+}
+addEmploymentRow();
+
+function getEmploymentHistory(){
+  return Array.from(document.querySelectorAll('#employment-rows .hist-row')).map(row => {
+    const inputs = row.querySelectorAll('input');
+    return {
+      employer: inputs[0].value,
+      position: inputs[1].value,
+      start_date: inputs[2].value,
+      end_date: inputs[3].value
+    };
+  }).filter(e => e.employer);
+}
+
+// --- License action detail toggle ---
+document.querySelectorAll('input[name="license-action"]').forEach(r => {
+  r.addEventListener('change', () => {
+    document.getElementById('f-license-action-detail').style.display =
+      document.querySelector('input[name="license-action"]:checked').value === 'yes' ? 'block' : 'none';
+  });
+});
+
+// --- Signature pad ---
+const canvas = document.getElementById('sig-pad');
+const ctx = canvas.getContext('2d');
+function resizeCanvas(){
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * devicePixelRatio;
+  canvas.height = rect.height * devicePixelRatio;
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+  ctx.strokeStyle = '#1A1F2E';
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+}
+resizeCanvas();
+window.addEventListener('resize', () => { const d = canvas.toDataURL(); resizeCanvas(); });
+
+let drawing = false, lastX = 0, lastY = 0;
+function getPos(e){
+  const rect = canvas.getBoundingClientRect();
+  const t = e.touches ? e.touches[0] : e;
+  return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+}
+function startDraw(e){ drawing = true; const p = getPos(e); lastX = p.x; lastY = p.y; e.preventDefault(); }
+function draw(e){
+  if(!drawing) return;
+  const p = getPos(e);
+  ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke();
+  lastX = p.x; lastY = p.y;
+  hasSignature = true;
+  document.getElementById('sig-status').textContent = 'Signed';
+  e.preventDefault();
+}
+function endDraw(){ drawing = false; }
+canvas.addEventListener('mousedown', startDraw);
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseup', endDraw);
+canvas.addEventListener('mouseleave', endDraw);
+canvas.addEventListener('touchstart', startDraw);
+canvas.addEventListener('touchmove', draw);
+canvas.addEventListener('touchend', endDraw);
+
+function clearSignature(){
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  hasSignature = false;
+  document.getElementById('sig-status').textContent = 'Not signed';
+}
+
+// --- Load / validate token, or self-provision a new application ---
+async function init(){
+  if(!token){
+    try{
+      const res = await fetch(`${SB_URL}/rest/v1/job_applications`, {
+        method:'POST',
+        headers:{...H,'Prefer':'return=representation'},
+        body: JSON.stringify({ full_name: 'New applicant', status: 'pending' })
+      });
+      if(!res.ok) throw new Error(await res.text());
+      const rows = await res.json();
+      token = rows[0].token;
+      const url = new URL(window.location);
+      url.searchParams.set('token', token);
+      window.history.replaceState({}, '', url);
+    }catch(e){
+      console.error(e);
+      document.getElementById('loading-msg').style.display = 'none';
+      document.getElementById('invalid-screen').style.display = 'block';
+      return;
+    }
+  }
+  document.getElementById('loading-msg').style.display = 'none';
+  document.getElementById('app-form').style.display = 'block';
+}
+init();
+
+// --- Submit ---
+document.getElementById('app-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errorEl = document.getElementById('form-error');
+  errorEl.style.display = 'none';
+
+  if(!hasSignature){
+    errorEl.textContent = 'Please sign before submitting.';
+    errorEl.style.display = 'block';
+    window.scrollTo({top: document.getElementById('sig-pad').offsetTop - 100, behavior:'smooth'});
+    return;
+  }
+
+  const signedName = document.getElementById('f-signed-name').value.trim();
+  if(!signedName){
+    errorEl.textContent = 'Please type your full legal name to confirm your signature.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  const licenseActionYes = document.querySelector('input[name="license-action"]:checked').value === 'yes';
+  const licenseActionStatement = licenseActionYes
+    ? (document.getElementById('f-license-action-detail').value || 'Yes — no details provided')
+    : 'None';
+
+  const payload = {
+    full_name: document.getElementById('f-name').value.trim(),
+    phone: document.getElementById('f-phone').value.trim(),
+    email: document.getElementById('f-email').value.trim() || null,
+    address: document.getElementById('f-address').value.trim(),
+    date_of_birth: document.getElementById('f-dob').value,
+    license_number: document.getElementById('f-license').value.trim(),
+    license_state: document.getElementById('f-license-state').value.trim().toUpperCase(),
+    cdl_class: document.getElementById('f-cdl').value.trim() || null,
+    employment_history: getEmploymentHistory(),
+    accident_history: document.getElementById('f-accidents').value.trim() || 'None',
+    violation_history: document.getElementById('f-violations').value.trim() || 'None',
+    license_action_statement: licenseActionStatement,
+    signature_data: canvas.toDataURL('image/png'),
+    signed_name: signedName,
+    signed_at: new Date().toISOString(),
+    status: 'submitted',
+    submitted_at: new Date().toISOString()
+  };
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.textContent = 'Submitting...';
+
+  try{
+    const res = await fetch(`${SB_URL}/rest/v1/job_applications?token=eq.${token}`, {
+      method: 'PATCH',
+      headers: { ...H, 'Prefer': 'return=minimal' },
+      body: JSON.stringify(payload)
+    });
+    if(!res.ok) throw new Error(await res.text());
+    document.getElementById('app-form').style.display = 'none';
+    document.getElementById('success-screen').style.display = 'block';
+  }catch(err){
+    errorEl.textContent = 'Something went wrong submitting your application. Please try again or contact the office.';
+    errorEl.style.display = 'block';
+    console.error(err);
+  }
+  btn.disabled = false; btn.textContent = 'Submit application';
+});
+</script>
+</body></html>
