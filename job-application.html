@@ -239,14 +239,13 @@ function clearSignature(){
 async function init(){
   if(!token){
     try{
-      const res = await fetch(`${SB_URL}/rest/v1/job_applications`, {
+      const res = await fetch(`${SB_URL}/rest/v1/rpc/create_job_application`, {
         method:'POST',
-        headers:{...H,'Prefer':'return=representation'},
-        body: JSON.stringify({ full_name: 'New applicant', status: 'pending' })
+        headers: H,
+        body: JSON.stringify({})
       });
       if(!res.ok) throw new Error(await res.text());
-      const rows = await res.json();
-      token = rows[0].token;
+      token = await res.json();
       const url = new URL(window.location);
       url.searchParams.set('token', token);
       window.history.replaceState({}, '', url);
