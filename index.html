@@ -47,7 +47,8 @@ img{max-width:100%;display:block}
 .nav-links a:hover{color:#fff}
 .nav-cta{background:var(--diesel);color:#fff !important;padding:9px 18px;border-radius:3px;font-weight:600}
 .nav-cta:hover{background:var(--diesel-dark)}
-.nav-toggle{display:none}
+.nav-toggle{display:none;flex-direction:column;justify-content:center;gap:5px;width:38px;height:38px;background:none;border:1px solid var(--line);border-radius:4px;cursor:pointer;padding:0}
+.nav-toggle span{width:18px;height:2px;background:#fff;margin:0 auto;display:block;border-radius:1px}
 
 /* ===== HERO / MANIFEST ===== */
 .hero{background:var(--asphalt);color:#fff;position:relative;overflow:hidden}
@@ -152,7 +153,11 @@ footer a:hover{color:#fff}
 
 /* ===== RESPONSIVE ===== */
 @media (max-width:860px){
-  .nav-links{display:none}
+  .nav-links{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:flex-start;gap:4px;background:var(--asphalt);border-bottom:3px solid var(--diesel);padding:12px 24px 20px}
+  .nav-links.open{display:flex}
+  .nav-links a{padding:10px 0;width:100%}
+  .nav-links .nav-cta{width:auto;text-align:center;margin-top:8px}
+  .nav-toggle{display:flex}
   .hero-main{grid-template-columns:1fr;padding:44px 0 40px}
   .stat-strip .wrap{grid-template-columns:repeat(2,1fr);gap:20px 0}
   .stat:nth-child(2){border-right:none}
@@ -172,13 +177,16 @@ footer a:hover{color:#fff}
       <div class="brand-mark">🚛</div>
       <div class="brand-name">BASHKA EXPRESS</div>
     </a>
-    <div class="nav-links">
+    <div class="nav-links" id="navLinks">
       <a href="#services">Services</a>
       <a href="#about">About</a>
       <a href="#portal">Team &amp; Driver Portal</a>
       <a href="#contact">Contact</a>
       <a href="/job-application.html" class="nav-cta">Apply to Drive</a>
     </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
 
@@ -320,6 +328,16 @@ const io = new IntersectionObserver((entries)=>{
   entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
 },{threshold:0.15});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+const navToggle = document.getElementById('navToggle');
+const navLinks = document.getElementById('navLinks');
+navToggle.addEventListener('click', () => {
+  const isOpen = navLinks.classList.toggle('open');
+  navToggle.setAttribute('aria-expanded', isOpen);
+});
+navLinks.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => navLinks.classList.remove('open'));
+});
 </script>
 
 </body>
