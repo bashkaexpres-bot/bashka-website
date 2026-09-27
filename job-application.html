@@ -2,42 +2,47 @@
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bashka Express — Driver Application</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --orange:#E85D04;--orange-dark:#9C4100;--orange-light:#FFF3E0;
-  --steel:#1A1F2E;--steel-mid:#2C3347;
-  --gray-100:#F5F5F5;--gray-200:#E8E8E8;--gray-400:#9E9E9E;--gray-600:#616161;--gray-800:#212121;
-  --green:#2E7D32;--green-bg:#E8F5E9;--red:#C62828;
-  --radius:6px;
+  --bg:#080b10;--card:#111620;--card-2:#151b28;--line:#232c3d;
+  --ink:#e8edf8;--ink-soft:#8b96b8;
+  --amber:#e8a020;--amber-dark:#c8850f;
+  --green:#3ddc84;--red:#ff6b6b;
+  --radius:8px;
 }
-body{font-family:system-ui,-apple-system,sans-serif;background:var(--gray-100);color:var(--gray-800);font-size:14px;min-height:100vh;padding:20px}
+body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;min-height:100vh;padding:20px}
 .wrap{max-width:640px;margin:0 auto}
-.header{background:var(--steel);border-radius:10px 10px 0 0;padding:20px 24px;color:#fff}
-.header h1{font-size:18px;font-weight:500}
-.header p{font-size:12px;color:#9AA3B8;margin-top:2px}
-.card{background:#fff;border-radius:0 0 10px 10px;padding:24px;box-shadow:0 2px 10px rgba(0,0,0,0.06)}
+.header{background:var(--card-2);border:1px solid var(--line);border-bottom:none;border-radius:12px 12px 0 0;padding:20px 24px;color:var(--ink)}
+.header h1{font-family:'Syne',sans-serif;font-size:18px;font-weight:700}
+.header p{font-size:12px;color:var(--ink-soft);margin-top:2px}
+.card{background:var(--card);border:1px solid var(--line);border-top:none;border-radius:0 0 12px 12px;padding:24px}
 .section{margin-bottom:24px}
-.section-title{font-size:14px;font-weight:600;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--gray-200)}
+.section-title{font-size:14px;font-weight:600;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--line);color:var(--ink)}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
 .form-group{display:flex;flex-direction:column;gap:5px}
 .form-group.full{grid-column:1/-1}
-.form-label{font-size:11px;color:var(--gray-600);font-weight:500;text-transform:uppercase;letter-spacing:0.5px}
-.form-input,.form-select,textarea{border:1px solid var(--gray-200);border-radius:var(--radius);padding:9px 10px;font-size:13px;font-family:inherit;outline:none;width:100%}
-.form-input:focus,textarea:focus{border-color:var(--orange)}
+.form-label{font-size:11px;color:var(--ink-soft);font-weight:500;text-transform:uppercase;letter-spacing:0.5px}
+.form-input,.form-select,textarea{background:var(--card-2);border:1px solid var(--line);border-radius:var(--radius);padding:9px 10px;font-size:13px;font-family:inherit;color:var(--ink);outline:none;width:100%}
+.form-input::placeholder,textarea::placeholder{color:#5c6580}
+.form-input:focus,textarea:focus{border-color:var(--amber)}
 textarea{resize:vertical;min-height:60px}
 .hist-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center}
 .hist-row input{font-size:12px;padding:7px 8px}
-.btn-add{background:none;border:1px dashed var(--gray-400);border-radius:var(--radius);padding:8px;font-size:12px;color:var(--gray-600);cursor:pointer;width:100%}
+.btn-add{background:none;border:1px dashed var(--line);border-radius:var(--radius);padding:8px;font-size:12px;color:var(--ink-soft);cursor:pointer;width:100%}
+.btn-add:hover{border-color:var(--amber);color:var(--ink)}
 .btn-remove{background:none;border:none;color:var(--red);cursor:pointer;font-size:16px;padding:4px}
 .radio-row{display:flex;gap:16px;align-items:center}
-.radio-row label{display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer}
-canvas#sig-pad{border:1px solid var(--gray-200);border-radius:var(--radius);background:#fdfdfd;touch-action:none;width:100%;height:150px;cursor:crosshair}
+.radio-row label{display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;color:var(--ink)}
+canvas#sig-pad{border:1px solid var(--line);border-radius:var(--radius);background:var(--card-2);touch-action:none;width:100%;height:150px;cursor:crosshair}
 .sig-actions{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
-.btn-clear{background:none;border:none;color:var(--gray-600);font-size:12px;cursor:pointer;text-decoration:underline}
-.consent{font-size:11px;color:var(--gray-600);margin:14px 0;line-height:1.5}
-.btn-submit{width:100%;background:var(--orange);border:none;border-radius:var(--radius);padding:13px;font-size:14px;font-weight:500;cursor:pointer;color:#fff}
-.btn-submit:hover{background:var(--orange-dark)}
+.btn-clear{background:none;border:none;color:var(--ink-soft);font-size:12px;cursor:pointer;text-decoration:underline}
+.consent{font-size:11px;color:var(--ink-soft);margin:14px 0;line-height:1.5}
+.btn-submit{width:100%;background:var(--amber);border:none;border-radius:var(--radius);padding:13px;font-size:14px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;color:#0a0a0a}
+.btn-submit:hover{background:var(--amber-dark)}
 .btn-submit:disabled{opacity:0.6;cursor:not-allowed}
 .error{color:var(--red);font-size:12px;margin-top:8px;display:none}
 .success-screen{text-align:center;padding:60px 24px}
@@ -53,7 +58,7 @@ canvas#sig-pad{border:1px solid var(--gray-200);border-radius:var(--radius);back
     <p>Please complete all required fields and sign at the bottom</p>
   </div>
   <div class="card" id="form-card">
-    <div id="loading-msg" style="text-align:center;padding:40px;color:var(--gray-400)">Loading application...</div>
+    <div id="loading-msg" style="text-align:center;padding:40px;color:var(--ink-soft)">Loading application...</div>
     <form id="app-form" style="display:none">
 
       <div class="section">
@@ -104,11 +109,11 @@ canvas#sig-pad{border:1px solid var(--gray-200);border-radius:var(--radius);back
 
       <div class="section">
         <div class="section-title">Signature</div>
-        <p style="font-size:12px;color:var(--gray-600);margin-bottom:8px">Sign using your mouse or finger below</p>
+        <p style="font-size:12px;color:var(--ink-soft);margin-bottom:8px">Sign using your mouse or finger below</p>
         <canvas id="sig-pad"></canvas>
         <div class="sig-actions">
           <button type="button" class="btn-clear" onclick="clearSignature()">Clear signature</button>
-          <span id="sig-status" style="font-size:11px;color:var(--gray-400)">Not signed</span>
+          <span id="sig-status" style="font-size:11px;color:var(--ink-soft)">Not signed</span>
         </div>
         <div class="form-group full" style="margin-top:12px">
           <label class="form-label required">Type your full legal name to confirm signature</label>
@@ -127,10 +132,10 @@ canvas#sig-pad{border:1px solid var(--gray-200);border-radius:var(--radius);back
     <div id="success-screen" class="success-screen" style="display:none">
       <div class="success-icon">✅</div>
       <h2>Application submitted</h2>
-      <p style="color:var(--gray-600);margin-top:8px">Thank you — your application has been received.</p>
+      <p style="color:var(--ink-soft);margin-top:8px">Thank you — your application has been received.</p>
     </div>
 
-    <div id="invalid-screen" style="display:none;text-align:center;padding:60px 24px;color:var(--gray-600)">
+    <div id="invalid-screen" style="display:none;text-align:center;padding:60px 24px;color:var(--ink-soft)">
       This application link is invalid or has already been used.
     </div>
   </div>
@@ -192,7 +197,7 @@ function resizeCanvas(){
   canvas.width = rect.width * devicePixelRatio;
   canvas.height = rect.height * devicePixelRatio;
   ctx.scale(devicePixelRatio, devicePixelRatio);
-  ctx.strokeStyle = '#1A1F2E';
+  ctx.strokeStyle = '#e8edf8';
   ctx.lineWidth = 2;
   ctx.lineCap = 'round';
 }
