@@ -132,7 +132,7 @@ section{padding:80px 0}
 .apply-band p{color:rgba(255,255,255,0.9);margin:14px auto 26px;max-width:52ch;font-size:15.5px}
 
 /* ===== CONTACT ===== */
-.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+.contact-grid{display:grid;grid-template-columns:1fr;gap:48px;max-width:520px;margin:0 auto}
 .contact-list{list-style:none}
 .contact-list li{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);font-size:15px}
 .contact-list li:last-child{border-bottom:none}
@@ -249,7 +249,7 @@ footer a:hover{color:#fff}
     <div class="reveal">
       <div class="section-eyebrow">ABOUT BASHKA EXPRESS</div>
       <h2 class="section-title">Built truck by truck, not overnight</h2>
-      <p>Bashka Express started as one truck and grew into a fleet of 21 — every one of them added because the work demanded it, not because a spreadsheet said to. We're based in Eagan, Minnesota, and we run this like a family business, because it is one.</p>
+      <p>Bashka Express started as one truck and grew into a full regional fleet — every truck added because the work demanded it, not because a spreadsheet said to. We're based in Eagan, Minnesota, and we run this like a family business, because it is one.</p>
       <p>Our managers rotate 24-hour coverage so dispatch is never asleep at the wheel, and every driver goes through the same pre-trip and post-trip inspection process — logged, timestamped, and on file.</p>
     </div>
     <div class="plaque reveal">
@@ -266,11 +266,16 @@ footer a:hover{color:#fff}
     <div class="section-eyebrow">TEAM &amp; DRIVER ACCESS</div>
     <h2 class="section-title reveal">Already work with us?</h2>
     <p class="section-lede reveal">Quick links for current staff and drivers. These lead to secure, password-protected logins — not open to the public.</p>
-    <div class="portal-grid reveal" style="grid-template-columns:1fr;max-width:340px;margin:0 auto">
+    <div class="portal-grid reveal" style="grid-template-columns:1fr 1fr;max-width:700px;margin:0 auto">
       <a href="https://bashka-three.vercel.app/index.html" class="portal-card">
         <span class="icon">📋</span>
         <h4>Dispatch</h4>
         <p>Live job assignments and tracking — dispatcher login</p>
+      </a>
+      <a href="https://bashka-three.vercel.app/driver-app.html" class="portal-card">
+        <span class="icon">📱</span>
+        <h4>Driver App</h4>
+        <p>Drivers: open this link and add it to your home screen — job assignments, GPS check-in, and inspections</p>
       </a>
     </div>
   </div>
@@ -290,14 +295,11 @@ footer a:hover{color:#fff}
     <h2 class="section-title reveal">Request a quote, or just ask a question</h2>
     <div class="contact-grid reveal">
       <ul class="contact-list">
-        <li><span class="k mono">PHONE</span><span>(XXX) XXX-XXXX <em style="color:var(--ink-soft);font-style:normal;font-size:12px">— add your number</em></span></li>
-        <li><span class="k mono">EMAIL</span><span>dispatch@bashkaexpress.com <em style="color:var(--ink-soft);font-style:normal;font-size:12px">— update if different</em></span></li>
-        <li><span class="k mono">ADDRESS</span><span>Eagan, MN <em style="color:var(--ink-soft);font-style:normal;font-size:12px">— add full street address</em></span></li>
+        <li><span class="k mono">PHONE</span><span>Business line launching soon — email us in the meantime</span></li>
+        <li><span class="k mono">EMAIL</span><span>dispatch@bashkaexpress.com</span></li>
+        <li><span class="k mono">ADDRESS</span><span>Eagan, MN</span></li>
         <li><span class="k mono">HOURS</span><span>Dispatch: 24 hours · Office: Mon–Fri, 8am–5pm</span></li>
       </ul>
-      <div class="map-note">
-        <strong>Note:</strong> Replace the placeholder phone, email, and address above with your real contact details before this goes live. If you'd like an actual contact form here instead of static text, let me know and I'll wire one up to send you an email or save submissions to Supabase.
-      </div>
     </div>
   </div>
 </section>
