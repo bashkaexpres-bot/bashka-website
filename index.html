@@ -108,11 +108,24 @@ h1.hero-title em{color:var(--amber);font-style:normal}
 .apply-band .btn-primary:hover{background:#1a1a1a}
 
 /* CONTACT */
-.contact-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:44px;max-width:760px}
+.contact-layout{display:grid;grid-template-columns:1.15fr 0.85fr;gap:40px;align-items:start;margin-top:44px}
+.contact-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;max-width:760px}
 .contact-item{display:flex;gap:16px;padding:20px;background:var(--card);border:1px solid var(--line);border-radius:10px}
 .contact-item .icon{font-size:20px}
 .contact-item .k{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.06em;color:var(--ink-soft);display:block;margin-bottom:4px}
 .contact-item .v{color:var(--ink);font-size:14.5px}
+.contact-form-card h3{font-size:19px;margin-bottom:20px}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px}
+.form-group input,.form-group textarea{width:100%;background:var(--card-2);border:1px solid var(--line);border-radius:8px;padding:11px 13px;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14px}
+.form-group input:focus,.form-group textarea:focus{outline:none;border-color:var(--amber)}
+.form-group textarea{min-height:110px;resize:vertical;font-family:inherit}
+#cf-submit{width:100%;justify-content:center;border:none}
+#cf-submit:disabled{opacity:0.6;cursor:default}
+#cf-status{margin-top:10px;font-size:13px}
+#cf-status.ok{color:#3fb950}
+#cf-status.err{color:#f0836a}
 
 /* FOOTER */
 footer{border-top:1px solid var(--line);padding:32px 0;font-size:13px;color:var(--ink-soft)}
@@ -130,6 +143,8 @@ footer a:hover{color:var(--ink)}
   .about-grid{grid-template-columns:1fr}
   .portal-grid{grid-template-columns:1fr}
   .contact-grid{grid-template-columns:1fr}
+  .contact-layout{grid-template-columns:1fr}
+  .form-row-2{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -159,7 +174,7 @@ footer a:hover{color:var(--ink)}
     <h1 class="hero-title">Moving <em>Minnesota</em> Forward, Every Mile</h1>
     <p class="hero-lede">Bashka Express LLC delivers dependable freight, last-mile, and regional logistics solutions across Minnesota and the Upper Midwest — run the way a family business should be run.</p>
     <div class="hero-ctas">
-      <a href="#contact" class="btn btn-primary">Request a Quote</a>
+      <a href="#contact-form" class="btn btn-primary">Request a Quote</a>
     </div>
     <div class="badge-strip">
       <div class="badge"><strong>24/7</strong>&nbsp;Dispatch Coverage</div>
@@ -253,13 +268,31 @@ footer a:hover{color:var(--ink)}
 
 <section id="contact">
   <div class="wrap">
-    <div class="eyebrow">Get in Touch</div>
-    <h2 class="section-title">Ready to ship? Let's talk.</h2>
-    <div class="contact-grid">
-      <div class="contact-item"><span class="icon">📍</span><div><span class="k">HEADQUARTERS</span><span class="v">Eagan, MN</span></div></div>
-      <div class="contact-item"><span class="icon">📞</span><div><span class="k">DISPATCH LINE</span><span class="v"><a href="tel:+16124441220" style="color:inherit;text-decoration:none">(612) 444-1220</a></span></div></div>
-      <div class="contact-item"><span class="icon">✉️</span><div><span class="k">EMAIL</span><span class="v">dispatch@bashkaexpress.com</span></div></div>
-      <div class="contact-item"><span class="icon">🕐</span><div><span class="k">HOURS</span><span class="v">Dispatch: 24 hours · Office: Mon–Fri, 8am–5pm</span></div></div>
+    <div class="contact-layout">
+      <div>
+        <div class="eyebrow">Get in Touch</div>
+        <h2 class="section-title">Ready to ship? Let's talk.</h2>
+        <div class="contact-grid">
+          <div class="contact-item"><span class="icon">📍</span><div><span class="k">HEADQUARTERS</span><span class="v">Eagan, MN</span></div></div>
+          <div class="contact-item"><span class="icon">📞</span><div><span class="k">DISPATCH LINE</span><span class="v"><a href="tel:+16124441220" style="color:inherit;text-decoration:none">(612) 444-1220</a></span></div></div>
+          <div class="contact-item"><span class="icon">✉️</span><div><span class="k">EMAIL</span><span class="v">dispatch@bashkaexpress.com</span></div></div>
+          <div class="contact-item"><span class="icon">🕐</span><div><span class="k">HOURS</span><span class="v">Dispatch: 24 hours · Office: Mon–Fri, 8am–5pm</span></div></div>
+        </div>
+      </div>
+      <div class="card contact-form-card" id="contact-form">
+        <h3>Send a Message</h3>
+        <form id="contactForm" onsubmit="submitContactForm(event)">
+          <div class="form-row-2">
+            <div class="form-group"><label for="cf-first">First Name</label><input type="text" id="cf-first" required></div>
+            <div class="form-group"><label for="cf-last">Last Name</label><input type="text" id="cf-last" required></div>
+          </div>
+          <div class="form-group"><label for="cf-company">Company</label><input type="text" id="cf-company" placeholder="Your Company LLC"></div>
+          <div class="form-group"><label for="cf-email">Email</label><input type="email" id="cf-email" required placeholder="you@company.com"></div>
+          <div class="form-group"><label for="cf-message">Message</label><textarea id="cf-message" required placeholder="Tell us about your freight needs..."></textarea></div>
+          <button type="submit" class="btn btn-primary" id="cf-submit">Send Message</button>
+          <div id="cf-status"></div>
+        </form>
+      </div>
     </div>
   </div>
 </section>
@@ -283,6 +316,56 @@ navToggle.addEventListener('click', () => {
 navLinks.querySelectorAll('a').forEach(a => {
   a.addEventListener('click', () => navLinks.classList.remove('open'));
 });
+
+const SB_URL = 'https://ghrbrwusfyjprxhivxfo.supabase.co';
+const SB_KEY = 'sb_publishable_NAFw4krk8evjh7Bx0VFD9g_EcuThMES';
+
+async function submitContactForm(e){
+  e.preventDefault();
+  const first = document.getElementById('cf-first').value.trim();
+  const last = document.getElementById('cf-last').value.trim();
+  const company = document.getElementById('cf-company').value.trim();
+  const email = document.getElementById('cf-email').value.trim();
+  const message = document.getElementById('cf-message').value.trim();
+  const status = document.getElementById('cf-status');
+  const btn = document.getElementById('cf-submit');
+  const name = (first + ' ' + last).trim();
+  status.className = '';
+  status.textContent = '';
+  if(!name || !email || !message){
+    status.textContent = 'Please fill in your name, email, and message.';
+    status.className = 'err';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  try{
+    const res = await fetch(`${SB_URL}/rest/v1/notifications`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SB_KEY,
+        'Authorization': 'Bearer ' + SB_KEY,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        title: 'Contact Form: ' + name,
+        message: `From: ${name} (${company || 'no company given'}) <${email}>\n\n${message}`,
+        type: 'contact'
+      })
+    });
+    if(!res.ok) throw new Error('Request failed (' + res.status + ')');
+    document.getElementById('contactForm').reset();
+    status.textContent = "Message sent — we'll get back to you soon.";
+    status.className = 'ok';
+  }catch(err){
+    status.textContent = 'Something went wrong sending your message. Please call or email us directly.';
+    status.className = 'err';
+  }finally{
+    btn.disabled = false;
+    btn.textContent = 'Send Message';
+  }
+}
 </script>
 
 </body>
