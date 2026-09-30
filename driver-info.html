@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bashka Express — Driver Information Form</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080b10;--card:#111620;--card-2:#151b28;--line:#232c3d;
+  --ink:#e8edf8;--ink-soft:#8b96b8;
+  --amber:#e8a020;--amber-dark:#c8850f;
+  --green:#3ddc84;--red:#ff6b6b;
+  --radius:8px;
+}
+body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;min-height:100vh;padding:20px}
+.wrap{max-width:640px;margin:0 auto}
+.header{background:var(--card-2);border:1px solid var(--line);border-bottom:none;border-radius:12px 12px 0 0;padding:20px 24px;color:var(--ink)}
+.header h1{font-family:'Syne',sans-serif;font-size:18px;font-weight:700}
+.header p{font-size:12px;color:var(--ink-soft);margin-top:2px}
+.card{background:var(--card);border:1px solid var(--line);border-top:none;border-radius:0 0 12px 12px;padding:24px}
+.section{margin-bottom:24px}
+.section-title{font-size:14px;font-weight:600;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--line);color:var(--ink)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+.form-label{font-size:11px;color:var(--ink-soft);font-weight:500;text-transform:uppercase;letter-spacing:0.5px}
+.form-input,.form-select{background:var(--card-2);border:1px solid var(--line);border-radius:var(--radius);padding:9px 10px;font-size:13px;font-family:inherit;color:var(--ink);outline:none;width:100%}
+.form-input::placeholder{color:#5c6580}
+.form-input:focus{border-color:var(--amber)}
+.hint{font-size:10.5px;color:var(--ink-soft);margin-top:2px}
+.consent{font-size:11px;color:var(--ink-soft);margin:14px 0;line-height:1.5}
+.btn-submit{width:100%;background:var(--amber);border:none;border-radius:var(--radius);padding:13px;font-size:14px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;color:#0a0a0a}
+.btn-submit:hover{background:var(--amber-dark)}
+.btn-submit:disabled{opacity:0.6;cursor:not-allowed}
+.error{color:var(--red);font-size:12px;margin-top:8px;display:none}
+.success-screen{text-align:center;padding:60px 24px}
+.success-icon{font-size:48px;margin-bottom:16px}
+.required::after{content:" *";color:var(--red)}
+@media(max-width:520px){.form-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <h1>🚛 Bashka Express — Driver Information</h1>
+    <p>Please fill in your details below so we can complete your driver profile</p>
+  </div>
+  <div class="card" id="form-card">
+    <form id="info-form">
+
+      <div class="section">
+        <div class="section-title">Your information</div>
+        <div class="form-grid">
+          <div class="form-group full"><label class="form-label required">Full name</label><input class="form-input" id="f-name" required></div>
+          <div class="form-group"><label class="form-label required">Phone</label><input class="form-input" id="f-phone" type="tel" placeholder="(651) 555-0100" required></div>
+          <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="f-email" type="email" placeholder="you@example.com"><div class="hint">Used for your driver portal login</div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Driver's license</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label required">License number</label><input class="form-input" id="f-license" required></div>
+          <div class="form-group"><label class="form-label required">License state</label><input class="form-input" id="f-license-state" maxlength="2" placeholder="e.g. MN" required></div>
+          <div class="form-group"><label class="form-label">Expiration date</label><input class="form-input" id="f-license-exp" type="date"></div>
+          <div class="form-group"><label class="form-label">Class / endorsements</label><input class="form-input" id="f-cdl" placeholder="e.g. Class A"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Emergency contact</div>
+        <div class="form-grid">
+          <div class="form-group full"><label class="form-label">Contact name</label><input class="form-input" id="f-ec-name"></div>
+          <div class="form-group"><label class="form-label">Relationship</label><input class="form-input" id="f-ec-rel" placeholder="e.g. Spouse"></div>
+          <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="f-ec-phone" type="tel"></div>
+        </div>
+      </div>
+
+      <div class="consent">
+        By submitting, you confirm this information is accurate to the best of your knowledge. It will be added to your driver profile at Bashka Express LLC.
+      </div>
+
+      <div class="error" id="form-error"></div>
+      <button type="submit" class="btn-submit" id="submit-btn">Submit</button>
+    </form>
+
+    <div id="success-screen" class="success-screen" style="display:none">
+      <div class="success-icon">✅</div>
+      <h2>Thank you!</h2>
+      <p style="color:var(--ink-soft);margin-top:8px">Your information has been received and will be added to your driver profile.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const SB_URL = 'https://ghrbrwusfyjprxhivxfo.supabase.co';
+const SB_KEY = 'sb_publishable_NAFw4krk8evjh7Bx0VFD9g_EcuThMES';
+
+document.getElementById('info-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errorEl = document.getElementById('form-error');
+  errorEl.style.display = 'none';
+
+  const full_name = document.getElementById('f-name').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const license_number = document.getElementById('f-license').value.trim();
+  const license_state = document.getElementById('f-license-state').value.trim().toUpperCase();
+
+  if(!full_name || !phone || !license_number || !license_state){
+    errorEl.textContent = 'Please fill in all required fields.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  const payload = {
+    full_name,
+    phone,
+    email: document.getElementById('f-email').value.trim() || null,
+    license_number,
+    license_state,
+    license_expiration: document.getElementById('f-license-exp').value || null,
+    cdl_class: document.getElementById('f-cdl').value.trim() || null,
+    emergency_contact_name: document.getElementById('f-ec-name').value.trim() || null,
+    emergency_contact_relationship: document.getElementById('f-ec-rel').value.trim() || null,
+    emergency_contact_phone: document.getElementById('f-ec-phone').value.trim() || null
+  };
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.textContent = 'Submitting...';
+
+  try{
+    const res = await fetch(`${SB_URL}/rest/v1/driver_info_submissions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SB_KEY,
+        'Authorization': 'Bearer ' + SB_KEY,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    });
+    if(!res.ok) throw new Error('Request failed (' + res.status + ')');
+    document.getElementById('info-form').style.display = 'none';
+    document.getElementById('success-screen').style.display = 'block';
+  }catch(err){
+    errorEl.textContent = 'Something went wrong submitting your information. Please try again or contact the office.';
+    errorEl.style.display = 'block';
+    console.error(err);
+  }
+  btn.disabled = false; btn.textContent = 'Submit';
+});
+</script>
+</body></html>
