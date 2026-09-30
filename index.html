@@ -340,7 +340,7 @@ async function submitContactForm(e){
   btn.disabled = true;
   btn.textContent = 'Sending...';
   try{
-    const res = await fetch(`${SB_URL}/rest/v1/notifications`, {
+    const res = await fetch(`${SB_URL}/rest/v1/contact_submissions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -349,9 +349,11 @@ async function submitContactForm(e){
         'Prefer': 'return=minimal'
       },
       body: JSON.stringify({
-        title: 'Contact Form: ' + name,
-        message: `From: ${name} (${company || 'no company given'}) <${email}>\n\n${message}`,
-        type: 'contact'
+        name: name,
+        email: email,
+        company: company || null,
+        message: message,
+        source: 'website'
       })
     });
     if(!res.ok) throw new Error('Request failed (' + res.status + ')');
