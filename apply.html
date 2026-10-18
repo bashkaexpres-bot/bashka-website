@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drive for Bashka Express — Driver Application</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080b10;--card:#111620;--card-2:#151b28;--line:#232c3d;--ink:#e8edf8;--ink-soft:#8b96b8;--amber:#e8a020;--amber-dark:#c8850f;--green:#3ddc84;--red:#ff6b6b;--radius:10px}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;min-height:100vh;padding:16px}
+.wrap{max-width:640px;margin:0 auto}
+.header{background:var(--card-2);border:1px solid var(--line);border-bottom:none;border-radius:14px 14px 0 0;padding:20px 22px}
+.header h1{font-family:'Syne',sans-serif;font-size:20px;font-weight:700}
+.header p{font-size:13px;color:var(--ink-soft);margin-top:4px}
+.progress{display:flex;gap:6px;margin-top:14px}
+.progress i{flex:1;height:5px;border-radius:3px;background:var(--line)}
+.progress i.on{background:var(--amber)}
+.stepname{font-size:12px;color:var(--ink-soft);margin-top:8px;text-transform:uppercase;letter-spacing:.6px}
+.card{background:var(--card);border:1px solid var(--line);border-top:none;border-radius:0 0 14px 14px;padding:22px}
+.step{display:none}.step.on{display:block}
+.step h2{font-family:'Syne',sans-serif;font-size:18px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.f{display:flex;flex-direction:column;gap:6px}.f.full{grid-column:1/-1}
+label.l,.l{font-size:12px;color:var(--ink-soft);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.req::after{content:" *";color:var(--red)}
+input,select,textarea{background:var(--card-2);border:1.5px solid var(--line);border-radius:var(--radius);padding:13px 12px;font-size:16px;font-family:inherit;color:var(--ink);outline:none;width:100%;min-height:48px}
+textarea{min-height:90px;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:var(--amber)}
+input.bad,select.bad,textarea.bad{border-color:var(--red)}
+.hint{font-size:12px;color:var(--ink-soft)}
+.yn{display:flex;gap:10px}
+.yn label{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--card-2);border:1.5px solid var(--line);border-radius:var(--radius);min-height:48px;cursor:pointer;font-weight:600}
+.yn input{display:none}
+.yn label.sel{border-color:var(--amber);background:#2a2110;color:var(--amber)}
+.emp{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;background:var(--card-2)}
+.emp .grid{margin-bottom:0}
+.emp h3{font-size:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.link{background:none;border:none;color:var(--amber);font-weight:600;font-size:14px;cursor:pointer;padding:8px 0;min-height:44px}
+.link.rm{color:var(--red)}
+.upl{background:var(--card-2);border:2px dashed var(--line);border-radius:var(--radius);padding:16px;text-align:center;position:relative;cursor:pointer}
+.upl input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upl .t{font-size:14px;color:var(--ink-soft)}.upl .t b{color:var(--amber)}
+.upl img{max-width:100%;max-height:150px;border-radius:8px;margin-top:10px;display:none}
+.nav{display:flex;gap:12px;margin-top:22px}
+.btn{flex:1;border:none;border-radius:var(--radius);padding:15px;font-size:16px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;min-height:52px}
+.btn.next{background:var(--amber);color:#0a0a0a}.btn.next:disabled{opacity:.6}
+.btn.back{background:var(--card-2);color:var(--ink);border:1.5px solid var(--line);flex:.6}
+.err{color:var(--red);font-size:14px;margin-top:12px;display:none}
+.consent{font-size:13px;color:var(--ink-soft);line-height:1.55;background:var(--card-2);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:14px}
+canvas{width:100%;height:150px;background:#fff;border-radius:var(--radius);touch-action:none;display:block}
+.hp{position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden}
+.done{text-align:center;padding:50px 10px}.done .big{font-size:52px;margin-bottom:12px}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.card{padding:18px}}
+</style></head>
+<body>
+<div class="wrap">
+<div class="header">
+  <h1>🚛 Drive for Bashka Express</h1>
+  <p>Driver application — takes about 8 minutes. Works best on your phone.</p>
+  <div class="progress" id="prog"><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="stepname" id="stepname"></div>
+</div>
+<div class="card">
+<form id="app" novalidate autocomplete="on">
+  <div class="hp"><label>Leave empty <input id="website" tabindex="-1" autocomplete="off"></label></div>
+
+  <section class="step on" data-name="About you">
+    <h2>About you</h2>
+    <div class="grid">
+      <div class="f full"><label class="l req" for="full_name">Full legal name</label><input id="full_name" autocomplete="name" required></div>
+      <div class="f"><label class="l req" for="phone">Phone</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(651) 555-0100" required></div>
+      <div class="f"><label class="l req" for="email">Email</label><input id="email" type="email" inputmode="email" autocomplete="email" required></div>
+      <div class="f"><label class="l req" for="date_of_birth">Date of birth</label><input id="date_of_birth" type="date" required></div>
+      <div class="f"><label class="l" for="years_at_address">Years at this address</label><input id="years_at_address" inputmode="numeric" placeholder="e.g. 3"></div>
+      <div class="f full"><label class="l req" for="address">Home address</label><input id="address" autocomplete="street-address" placeholder="Street, city, state, ZIP" required></div>
+      <div class="f full"><span class="l req">Are you legally authorized to work in the United States?</span>
+        <div class="yn" data-k="work_eligible"><label><input type="radio" name="work_eligible" value="yes">Yes</label><label><input type="radio" name="work_eligible" value="no">No</label></div></div>
+    </div>
+  </section>
+
+  <section class="step" data-name="License">
+    <h2>Your CDL / license</h2>
+    <div class="grid">
+      <div class="f"><label class="l req" for="license_number">License number</label><input id="license_number" autocomplete="off" required></div>
+      <div class="f"><label class="l req" for="license_state">State</label><input id="license_state" maxlength="2" placeholder="MN" autocapitalize="characters" required></div>
+      <div class="f"><label class="l" for="license_expiration">License expires</label><input id="license_expiration" type="date"></div>
+      <div class="f"><label class="l" for="cdl_class">Class</label>
+        <select id="cdl_class"><option value="">Select…</option><option>Class A</option><option>Class B</option><option>Class C</option><option>Regular license (no CDL)</option></select></div>
+      <div class="f full"><label class="l" for="endorsements">Endorsements</label><input id="endorsements" placeholder="e.g. H, N, T, X — or none"></div>
+      <div class="f"><label class="l" for="medical_card_expiration">DOT medical card expires</label><input id="medical_card_expiration" type="date"></div>
+      <div class="f"><label class="l" for="cdl_experience_years">Years driving trucks</label><input id="cdl_experience_years" inputmode="numeric" placeholder="e.g. 5"></div>
+      <div class="f full"><span class="l">Photo of your license (front) — optional</span>
+        <div class="upl"><input type="file" id="dl_photo" accept="image/*"><div class="t">📷 Tap to <b>take a photo</b> or choose one</div><img id="dl_prev" alt=""></div></div>
+      <div class="f full"><span class="l">Photo of DOT medical card — optional</span>
+        <div class="upl"><input type="file" id="med_photo" accept="image/*"><div class="t">🏥 Tap to <b>take a photo</b> or choose one</div><img id="med_prev" alt=""></div></div>
+    </div>
+  </section>
+
+  <section class="step" data-name="Work history">
+    <h2>Work history</h2>
+    <p class="hint" style="margin-bottom:14px">Start with your most recent job. Please list the last 3 years (more if you drove a truck).</p>
+    <div id="emps"></div>
+    <button type="button" class="link" id="addEmp">+ Add another employer</button>
+    <div class="grid" style="margin-top:10px">
+      <div class="f"><label class="l" for="position_applied">Position</label>
+        <select id="position_applied"><option>Local driver</option><option>Regional driver</option><option>Over-the-road driver</option><option>Any</option></select></div>
+      <div class="f"><label class="l" for="available_start">Can start</label><input id="available_start" type="date"></div>
+    </div>
+  </section>
+
+  <section class="step" data-name="Driving record">
+    <h2>Driving record</h2>
+    <div class="grid">
+      <div class="f full"><span class="l req">Any accidents in the last 3 years?</span>
+        <div class="yn" data-k="had_accidents"><label><input type="radio" name="had_accidents" value="no">No</label><label><input type="radio" name="had_accidents" value="yes">Yes</label></div>
+        <textarea id="accident_history" style="display:none" placeholder="Date, location, what happened, any injuries"></textarea></div>
+      <div class="f full"><span class="l req">Any traffic violations in the last 3 years?</span>
+        <div class="yn" data-k="had_violations"><label><input type="radio" name="had_violations" value="no">No</label><label><input type="radio" name="had_violations" value="yes">Yes</label></div>
+        <textarea id="violation_history" style="display:none" placeholder="Date, violation, state"></textarea></div>
+      <div class="f full"><span class="l req">Has your license ever been suspended, denied or revoked?</span>
+        <div class="yn" data-k="license_action"><label><input type="radio" name="license_action" value="no">No</label><label><input type="radio" name="license_action" value="yes">Yes</label></div>
+        <textarea id="license_action_detail" style="display:none" placeholder="Please explain"></textarea></div>
+      <div class="f full"><span class="l req">Can you pass a DOT physical and drug screen?</span>
+        <div class="yn" data-k="can_pass_dot"><label><input type="radio" name="can_pass_dot" value="yes">Yes</label><label><input type="radio" name="can_pass_dot" value="no">No</label></div></div>
+    </div>
+  </section>
+
+  <section class="step" data-name="Sign">
+    <h2>Review &amp; sign</h2>
+    <div class="consent">I certify that everything in this application is true and complete. I understand a false answer can disqualify me or end my employment. I authorize Bashka Express LLC to contact my previous employers and to check my driving record, as allowed by law (including 49 CFR Part 391), in order to review my application.</div>
+    <div class="f" style="margin-bottom:14px"><label class="l req" for="signed_name">Type your full legal name</label><input id="signed_name" autocomplete="off" required></div>
+    <div class="f"><span class="l req">Sign with your finger</span><canvas id="sig"></canvas>
+      <button type="button" class="link" id="clearSig" style="align-self:flex-start">Clear signature</button></div>
+    <label style="display:flex;gap:10px;align-items:flex-start;margin-top:8px;font-size:14px"><input type="checkbox" id="agree" style="width:24px;min-height:24px;margin-top:2px"> I agree to the statement above</label>
+  </section>
+
+  <div class="err" id="err"></div>
+  <div class="nav"><button type="button" class="btn back" id="back" style="display:none">Back</button><button type="button" class="btn next" id="next">Next</button></div>
+</form>
+
+<div id="done" class="done" style="display:none">
+  <div class="big">✅</div><h2 style="font-family:Syne,sans-serif;margin-bottom:8px">Application received</h2>
+  <p style="color:var(--ink-soft)">Thank you! Bashka Express will review your application and contact you by phone or email.</p>
+</div>
+</div>
+</div>
+
+<script>
+const SB_URL='https://ghrbrwusfyjprxhivxfo.supabase.co';
+const SB_KEY='sb_publishable_NAFw4krk8evjh7Bx0VFD9g_EcuThMES';
+const $=id=>document.getElementById(id);
+const steps=[...document.querySelectorAll('.step')];
+let cur=0,signed=false,subId=(self.crypto&&crypto.randomUUID)?crypto.randomUUID():null;
+
+function show(n){
+  cur=n;steps.forEach((s,i)=>s.classList.toggle('on',i===n));
+  [...$('prog').children].forEach((b,i)=>b.classList.toggle('on',i<=n));
+  $('stepname').textContent='Step '+(n+1)+' of '+steps.length+' · '+steps[n].dataset.name;
+  $('back').style.display=n?'':'none';
+  $('next').textContent=n===steps.length-1?'Submit application':'Next';
+  $('err').style.display='none';window.scrollTo({top:0,behavior:'smooth'});
+  if(n===steps.length-1)sizeCanvas();
+}
+function fail(msg,el){$('err').textContent=msg;$('err').style.display='block';if(el){el.classList.add('bad');el.scrollIntoView({block:'center',behavior:'smooth'});el.focus&&el.focus();}}
+
+// Yes/No buttons
+document.querySelectorAll('.yn').forEach(g=>{
+  g.addEventListener('change',()=>{
+    g.querySelectorAll('label').forEach(l=>l.classList.toggle('sel',l.querySelector('input').checked));
+    const k=g.dataset.k,v=g.querySelector('input:checked').value;
+    const map={had_accidents:'accident_history',had_violations:'violation_history',license_action:'license_action_detail'};
+    if(map[k])$(map[k]).style.display=v==='yes'?'block':'none';
+  });
+});
+const yn=k=>{const e=document.querySelector('input[name="'+k+'"]:checked');return e?e.value:null};
+
+// Employers
+function addEmp(){
+  const n=$('emps').children.length+1;
+  const d=document.createElement('div');d.className='emp';
+  d.innerHTML='<h3><span>Employer '+n+'</span>'+(n>1?'<button type="button" class="link rm">Remove</button>':'')+'</h3><div class="grid">'+
+  '<div class="f full"><label class="l">Company</label><input data-f="employer"></div>'+
+  '<div class="f"><label class="l">Your position</label><input data-f="position"></div>'+
+  '<div class="f"><label class="l">Company phone</label><input data-f="phone" type="tel" inputmode="tel"></div>'+
+  '<div class="f"><label class="l">From</label><input data-f="start_date" type="month"></div>'+
+  '<div class="f"><label class="l">To</label><input data-f="end_date" type="month"></div>'+
+  '<div class="f full"><label class="l">Reason for leaving</label><input data-f="reason"></div></div>';
+  const rm=d.querySelector('.rm');if(rm)rm.onclick=()=>{d.remove();[...$('emps').children].forEach((c,i)=>c.querySelector('h3 span').textContent='Employer '+(i+1))};
+  $('emps').appendChild(d);
+}
+$('addEmp').onclick=addEmp;addEmp();
+const emps=()=>[...$('emps').children].map(d=>{const o={};d.querySelectorAll('[data-f]').forEach(i=>o[i.dataset.f]=i.value.trim());return o}).filter(o=>o.employer);
+
+// Photos: shrink before upload
+const photos={dl:null,med:null};
+function pick(inputId,prevId,key){
+  $(inputId).addEventListener('change',async e=>{
+    const f=e.target.files[0];if(!f)return;
+    try{
+      const bmp=await createImageBitmap(f);const sc=Math.min(1,1600/Math.max(bmp.width,bmp.height));
+      const c=document.createElement('canvas');c.width=Math.round(bmp.width*sc);c.height=Math.round(bmp.height*sc);
+      c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+      photos[key]=await new Promise(r=>c.toBlob(r,'image/jpeg',.82));
+      $(prevId).src=URL.createObjectURL(photos[key]);$(prevId).style.display='block';
+    }catch(x){photos[key]=null;fail('We could not read that photo. You can skip it and bring your license to the interview.')}
+  });
+}
+pick('dl_photo','dl_prev','dl');pick('med_photo','med_prev','med');
+async function upload(key,name){
+  if(!photos[key]||!subId)return null;
+  const path=subId+'/'+name+'.jpg';
+  try{
+    const r=await fetch(SB_URL+'/storage/v1/object/applications/'+path,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'image/jpeg'},body:photos[key]});
+    return r.ok?path:null;
+  }catch(e){return null}
+}
+
+// Signature
+const cv=$('sig'),cx=cv.getContext('2d');let drawing=false,lx=0,ly=0;
+function sizeCanvas(){const r=cv.getBoundingClientRect();if(!r.width||cv.width===Math.round(r.width*devicePixelRatio))return;const d=devicePixelRatio||1;cv.width=Math.round(r.width*d);cv.height=Math.round(r.height*d);cx.setTransform(d,0,0,d,0,0);cx.strokeStyle='#111';cx.lineWidth=2.4;cx.lineCap='round';cx.lineJoin='round';signed=false}
+const pos=e=>{const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+cv.addEventListener('pointerdown',e=>{drawing=true;const p=pos(e);lx=p.x;ly=p.y;cv.setPointerCapture(e.pointerId);e.preventDefault()});
+cv.addEventListener('pointermove',e=>{if(!drawing)return;const p=pos(e);cx.beginPath();cx.moveTo(lx,ly);cx.lineTo(p.x,p.y);cx.stroke();lx=p.x;ly=p.y;signed=true;e.preventDefault()});
+['pointerup','pointercancel'].forEach(t=>cv.addEventListener(t,()=>drawing=false));
+$('clearSig').onclick=()=>{cx.clearRect(0,0,cv.width,cv.height);signed=false};
+function sigPng(){const o=document.createElement('canvas');o.width=cv.width;o.height=cv.height;const c=o.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,o.width,o.height);c.drawImage(cv,0,0);return o.toDataURL('image/png')}
+
+// Validation
+function need(ids){for(const id of ids){const e=$(id);e.classList.remove('bad');if(!e.value.trim()){fail('Please fill in the highlighted field.',e);return false}}return true}
+function validate(n){
+  document.querySelectorAll('.bad').forEach(x=>x.classList.remove('bad'));
+  if(n===0){
+    if(!need(['full_name','phone','email','date_of_birth','address']))return false;
+    if(!/^\S+@\S+\.\S+$/.test($('email').value.trim())){fail('Please enter a valid email.',$('email'));return false}
+    if($('phone').value.replace(/\D/g,'').length<10){fail('Please enter a valid phone number.',$('phone'));return false}
+    if(!yn('work_eligible')){fail('Please answer the work authorization question.');return false}
+  }
+  if(n===1&&!need(['license_number','license_state']))return false;
+  if(n===3){
+    for(const k of['had_accidents','had_violations','license_action','can_pass_dot'])if(!yn(k)){fail('Please answer every question on this page.');return false}
+    if(yn('had_accidents')==='yes'&&!need(['accident_history']))return false;
+    if(yn('had_violations')==='yes'&&!need(['violation_history']))return false;
+    if(yn('license_action')==='yes'&&!need(['license_action_detail']))return false;
+  }
+  if(n===4){
+    if(!need(['signed_name']))return false;
+    if(!signed){fail('Please sign in the box.',cv);return false}
+    if(!$('agree').checked){fail('Please tick the box to agree.',$('agree'));return false}
+  }
+  return true;
+}
+$('back').onclick=()=>show(cur-1);
+$('next').onclick=async()=>{
+  if(!validate(cur))return;
+  if(cur<steps.length-1){show(cur+1);return}
+  if($('website').value)return; // bot trap
+  const btn=$('next');btn.disabled=true;btn.textContent='Sending…';$('err').style.display='none';
+  try{
+    const dl=await upload('dl','license'),med=await upload('med','medical');
+    const p={id:subId,full_name:$('full_name').value.trim(),phone:$('phone').value.trim(),email:$('email').value.trim(),
+      date_of_birth:$('date_of_birth').value||null,address:$('address').value.trim(),years_at_address:$('years_at_address').value.trim()||null,
+      work_eligible:yn('work_eligible')==='yes',license_number:$('license_number').value.trim(),license_state:$('license_state').value.trim().toUpperCase(),
+      license_expiration:$('license_expiration').value||null,cdl_class:$('cdl_class').value||null,endorsements:$('endorsements').value.trim()||null,
+      medical_card_expiration:$('medical_card_expiration').value||null,cdl_experience_years:$('cdl_experience_years').value.trim()||null,
+      position_applied:$('position_applied').value,available_start:$('available_start').value||null,employment_history:emps(),
+      accident_history:yn('had_accidents')==='yes'?$('accident_history').value.trim():null,
+      violation_history:yn('had_violations')==='yes'?$('violation_history').value.trim():null,
+      license_action:yn('license_action')==='yes',license_action_detail:yn('license_action')==='yes'?$('license_action_detail').value.trim():null,
+      can_pass_dot:yn('can_pass_dot')==='yes',signed_name:$('signed_name').value.trim(),signature_data:sigPng(),
+      dl_photo_path:dl,medical_card_photo_path:med};
+    const r=await fetch(SB_URL+'/rest/v1/rpc/submit_driver_application',{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({p})});
+    if(!r.ok)throw new Error(await r.text());
+    $('app').style.display='none';$('done').style.display='block';$('prog').style.display='none';$('stepname').textContent='Done';window.scrollTo({top:0});
+  }catch(e){
+    console.error(e);btn.disabled=false;btn.textContent='Submit application';
+    fail('Sorry, we could not send your application. Please check your connection and try again, or call us.');
+  }
+};
+show(0);
+</script>
+</body></html>
