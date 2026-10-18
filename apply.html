@@ -71,12 +71,12 @@ canvas{width:100%;height:140px;background:#fff;border-radius:var(--radius);touch
   <section class="step on" data-name="About you">
     <h2>About you</h2>
     <div class="grid">
-      <div class="f full"><label class="l req" for="full_name">Full legal name</label><input id="full_name" autocomplete="name" required></div>
-      <div class="f"><label class="l req" for="phone">Phone</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(651) 555-0100" required></div>
-      <div class="f"><label class="l req" for="email">Email</label><input id="email" type="email" inputmode="email" autocomplete="email" required></div>
+      <div class="f full"><label class="l req" for="full_name">Full legal name</label><input id="full_name" autocomplete="name" maxlength="120" required></div>
+      <div class="f"><label class="l req" for="phone">Phone</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="30" placeholder="(651) 555-0100" required></div>
+      <div class="f"><label class="l req" for="email">Email</label><input id="email" type="email" inputmode="email" autocomplete="email" maxlength="200" required></div>
       <div class="f"><label class="l req" for="date_of_birth">Date of birth</label><input id="date_of_birth" type="date" required></div>
-      <div class="f"><label class="l" for="years_at_address">Years at this address</label><input id="years_at_address" inputmode="numeric" placeholder="e.g. 3"></div>
-      <div class="f full"><label class="l req" for="address">Home address</label><input id="address" autocomplete="street-address" placeholder="Street, city, state, ZIP" required></div>
+      <div class="f"><label class="l" for="years_at_address">Years at this address</label><input id="years_at_address" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="e.g. 3"></div>
+      <div class="f full"><label class="l req" for="address">Home address</label><input id="address" autocomplete="street-address" maxlength="300" placeholder="Street, city, state, ZIP" required></div>
       <div class="f full"><span class="l req">Are you legally authorized to work in the United States?</span>
         <div class="yn" data-k="work_eligible"><label><input type="radio" name="work_eligible" value="yes">Yes</label><label><input type="radio" name="work_eligible" value="no">No</label></div></div>
     </div>
@@ -85,14 +85,14 @@ canvas{width:100%;height:140px;background:#fff;border-radius:var(--radius);touch
   <section class="step" data-name="License">
     <h2>Your CDL / license</h2>
     <div class="grid">
-      <div class="f"><label class="l req" for="license_number">License number</label><input id="license_number" autocomplete="off" required></div>
+      <div class="f"><label class="l req" for="license_number">License number</label><input id="license_number" autocomplete="off" maxlength="40" required></div>
       <div class="f"><label class="l req" for="license_state">State</label><input id="license_state" maxlength="2" placeholder="MN" autocapitalize="characters" required></div>
       <div class="f"><label class="l" for="license_expiration">License expires</label><input id="license_expiration" type="date"></div>
       <div class="f"><label class="l" for="cdl_class">Class</label>
         <select id="cdl_class"><option value="">Select…</option><option value="Class A">Class A</option><option value="Class B">Class B</option><option value="Class C">Class C</option><option value="Regular license (no CDL)">Regular license (no CDL)</option></select></div>
-      <div class="f full"><label class="l" for="endorsements">Endorsements</label><input id="endorsements" placeholder="e.g. H, N, T, X — or none"></div>
+      <div class="f full"><label class="l" for="endorsements">Endorsements</label><input id="endorsements" autocomplete="off" maxlength="80" placeholder="e.g. H, N, T, X — or none"></div>
       <div class="f"><label class="l" for="medical_card_expiration">DOT medical card expires</label><input id="medical_card_expiration" type="date"></div>
-      <div class="f"><label class="l" for="cdl_experience_years">Years driving trucks</label><input id="cdl_experience_years" inputmode="numeric" placeholder="e.g. 5"></div>
+      <div class="f"><label class="l" for="cdl_experience_years">Years driving trucks</label><input id="cdl_experience_years" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="e.g. 5"></div>
       <div class="f full"><span class="l">Photo of your license (front) — optional</span>
         <div class="upl"><input type="file" id="dl_photo" accept="image/*"><div class="t">📷 <span>Tap to take a photo or choose one</span></div><img id="dl_prev" alt=""></div></div>
       <div class="f full"><span class="l">Photo of DOT medical card — optional</span>
@@ -305,14 +305,14 @@ $('next').onclick=async()=>{
   try{
     const dl=await upload('dl','license'),med=await upload('med','medical');
     const p={id:subId,language:LANG,full_name:$('full_name').value.trim(),phone:$('phone').value.trim(),email:$('email').value.trim(),
-      date_of_birth:$('date_of_birth').value||null,address:$('address').value.trim(),years_at_address:$('years_at_address').value.trim()||null,
+      date_of_birth:$('date_of_birth').value||null,address:$('address').value.trim(),years_at_address:($('years_at_address').value.trim()||'').slice(0,20)||null,
       work_eligible:yn('work_eligible')==='yes',license_number:$('license_number').value.trim(),license_state:$('license_state').value.trim().toUpperCase(),
-      license_expiration:$('license_expiration').value||null,cdl_class:$('cdl_class').value||null,endorsements:$('endorsements').value.trim()||null,
-      medical_card_expiration:$('medical_card_expiration').value||null,cdl_experience_years:$('cdl_experience_years').value.trim()||null,
+      license_expiration:$('license_expiration').value||null,cdl_class:$('cdl_class').value||null,endorsements:($('endorsements').value.trim()||'').slice(0,80)||null,
+      medical_card_expiration:$('medical_card_expiration').value||null,cdl_experience_years:($('cdl_experience_years').value.trim()||'').slice(0,20)||null,
       position_applied:$('position_applied').value,available_start:$('available_start').value||null,employment_history:emps(),
-      accident_history:yn('had_accidents')==='yes'?$('accident_history').value.trim():null,
-      violation_history:yn('had_violations')==='yes'?$('violation_history').value.trim():null,
-      license_action:yn('license_action')==='yes',license_action_detail:yn('license_action')==='yes'?$('license_action_detail').value.trim():null,
+      accident_history:yn('had_accidents')==='yes'?$('accident_history').value.trim().slice(0,2000):null,
+      violation_history:yn('had_violations')==='yes'?$('violation_history').value.trim().slice(0,2000):null,
+      license_action:yn('license_action')==='yes',license_action_detail:yn('license_action')==='yes'?$('license_action_detail').value.trim().slice(0,2000):null,
       can_pass_dot:yn('can_pass_dot')==='yes',signed_name:$('signed_name').value.trim(),signature_data:padApp.png(),background_consent:{version:'2026-10',authorized:true,psp:$('bg_psp').checked,clearinghouse:$('bg_ch').checked,signed_name:$('bg_name').value.trim(),signature_data:padBg.png(),signed_at:new Date().toISOString(),language:LANG},
       dl_photo_path:dl,medical_card_photo_path:med};
     const r=await fetch(SB_URL+'/rest/v1/rpc/submit_driver_application',{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({p})});
