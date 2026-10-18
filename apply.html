@@ -15,6 +15,7 @@ body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;background:var(--b
 .header{background:var(--card-2);border:1px solid var(--line);border-bottom:none;border-radius:14px 14px 0 0;padding:20px 22px}
 .header h1{font-family:'Syne',sans-serif;font-size:20px;font-weight:700}
 .header p{font-size:13px;color:var(--ink-soft);margin-top:4px}
+.lang{display:flex;gap:8px;margin-top:12px}.lang button{flex:1;min-height:44px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font-weight:600;font-size:15px;font-family:inherit;cursor:pointer}.lang button.on{border-color:var(--amber);background:#2a2110;color:var(--amber)}
 .progress{display:flex;gap:6px;margin-top:14px}
 .progress i{flex:1;height:5px;border-radius:3px;background:var(--line)}
 .progress i.on{background:var(--amber)}
@@ -60,6 +61,7 @@ canvas{width:100%;height:150px;background:#fff;border-radius:var(--radius);touch
 <div class="header">
   <h1>🚛 Drive for Bashka Express</h1>
   <p>Driver application — takes about 8 minutes. Works best on your phone.</p>
+  <div class="lang" id="lang"><button type="button" data-l="en" class="on">English</button><button type="button" data-l="so">Soomaali</button><button type="button" data-l="es">Español</button></div>
   <div class="progress" id="prog"><i></i><i></i><i></i><i></i><i></i></div>
   <div class="stepname" id="stepname"></div>
 </div>
@@ -88,14 +90,14 @@ canvas{width:100%;height:150px;background:#fff;border-radius:var(--radius);touch
       <div class="f"><label class="l req" for="license_state">State</label><input id="license_state" maxlength="2" placeholder="MN" autocapitalize="characters" required></div>
       <div class="f"><label class="l" for="license_expiration">License expires</label><input id="license_expiration" type="date"></div>
       <div class="f"><label class="l" for="cdl_class">Class</label>
-        <select id="cdl_class"><option value="">Select…</option><option>Class A</option><option>Class B</option><option>Class C</option><option>Regular license (no CDL)</option></select></div>
+        <select id="cdl_class"><option value="">Select…</option><option value="Class A">Class A</option><option value="Class B">Class B</option><option value="Class C">Class C</option><option value="Regular license (no CDL)">Regular license (no CDL)</option></select></div>
       <div class="f full"><label class="l" for="endorsements">Endorsements</label><input id="endorsements" placeholder="e.g. H, N, T, X — or none"></div>
       <div class="f"><label class="l" for="medical_card_expiration">DOT medical card expires</label><input id="medical_card_expiration" type="date"></div>
       <div class="f"><label class="l" for="cdl_experience_years">Years driving trucks</label><input id="cdl_experience_years" inputmode="numeric" placeholder="e.g. 5"></div>
       <div class="f full"><span class="l">Photo of your license (front) — optional</span>
-        <div class="upl"><input type="file" id="dl_photo" accept="image/*"><div class="t">📷 Tap to <b>take a photo</b> or choose one</div><img id="dl_prev" alt=""></div></div>
+        <div class="upl"><input type="file" id="dl_photo" accept="image/*"><div class="t">📷 <span>Tap to take a photo or choose one</span></div><img id="dl_prev" alt=""></div></div>
       <div class="f full"><span class="l">Photo of DOT medical card — optional</span>
-        <div class="upl"><input type="file" id="med_photo" accept="image/*"><div class="t">🏥 Tap to <b>take a photo</b> or choose one</div><img id="med_prev" alt=""></div></div>
+        <div class="upl"><input type="file" id="med_photo" accept="image/*"><div class="t">🏥 <span>Tap to take a photo or choose one</span></div><img id="med_prev" alt=""></div></div>
     </div>
   </section>
 
@@ -106,7 +108,7 @@ canvas{width:100%;height:150px;background:#fff;border-radius:var(--radius);touch
     <button type="button" class="link" id="addEmp">+ Add another employer</button>
     <div class="grid" style="margin-top:10px">
       <div class="f"><label class="l" for="position_applied">Position</label>
-        <select id="position_applied"><option>Local driver</option><option>Regional driver</option><option>Over-the-road driver</option><option>Any</option></select></div>
+        <select id="position_applied"><option value="Local driver">Local driver</option><option value="Regional driver">Regional driver</option><option value="Over-the-road driver">Over-the-road driver</option><option value="Any">Any</option></select></div>
       <div class="f"><label class="l" for="available_start">Can start</label><input id="available_start" type="date"></div>
     </div>
   </section>
@@ -155,16 +157,41 @@ const $=id=>document.getElementById(id);
 const steps=[...document.querySelectorAll('.step')];
 let cur=0,signed=false,subId=(self.crypto&&crypto.randomUUID)?crypto.randomUUID():null;
 
-function show(n){
+
+// ---- Languages: English / Soomaali / Español ----
+const D={"🚛 Drive for Bashka Express":["🚛 La shaqee Bashka Express","🚛 Conduce para Bashka Express"],"Driver application — takes about 8 minutes. Works best on your phone.":["Codsiga darawalnimada — waxay qaadataa qiyaastii 8 daqiiqo. Waxay ugu fiican tahay taleefankaaga.","Solicitud de conductor — toma unos 8 minutos. Funciona mejor en su teléfono."],"About you":["Ku saabsan adiga","Sobre usted"],"Full legal name":["Magaca buuxa ee sharciga ah","Nombre legal completo"],"Phone":["Taleefan","Teléfono"],"Email":["Iimayl","Correo electrónico"],"Date of birth":["Taariikhda dhalashada","Fecha de nacimiento"],"Years at this address":["Sannadaha cinwaankan","Años en esta dirección"],"Home address":["Cinwaanka guriga","Dirección de su casa"],"Are you legally authorized to work in the United States?":["Ma haysataa ogolaansho sharci ah oo aad ku shaqeyso Mareykanka?","¿Está legalmente autorizado para trabajar en los Estados Unidos?"],"Yes":["Haa","Sí"],"No":["Maya","No"],"Your CDL / license":["CDL-kaaga / shatiga","Su CDL / licencia"],"License number":["Lambarka shatiga","Número de licencia"],"State":["Gobolka","Estado"],"License expires":["Shatigu wuu dhacayaa","La licencia vence"],"Class":["Heerka (Class)","Clase"],"Select…":["Dooro…","Seleccionar…"],"Class A":["Class A","Clase A"],"Class B":["Class B","Clase B"],"Class C":["Class C","Clase C"],"Regular license (no CDL)":["Shati caadi ah (CDL la'aan)","Licencia regular (sin CDL)"],"Endorsements":["Ogolaanshaha dheeraadka ah (Endorsements)","Endosos"],"DOT medical card expires":["Kaadhka caafimaadka DOT wuu dhacayaa","La tarjeta médica DOT vence"],"Years driving trucks":["Sannadaha aad darawalka gaadhi weyn ahayd","Años manejando camiones"],"Photo of your license (front) — optional":["Sawirka shatigaaga (hore) — ikhtiyaari","Foto de su licencia (frente) — opcional"],"Tap to take a photo or choose one":["Taabo si aad sawir u qaadato ama u doorato","Toque para tomar una foto o elegir una"],"Photo of DOT medical card — optional":["Sawirka kaadhka caafimaadka DOT — ikhtiyaari","Foto de la tarjeta médica DOT — opcional"],"Work history":["Taariikhda shaqada","Historial de trabajo"],"Start with your most recent job. Please list the last 3 years (more if you drove a truck).":["Ka bilow shaqadaadii ugu dambeysay. Fadlan ku qor 3-dii sano ee la soo dhaafay (in ka badan haddii aad gaadhi weyn wadi jirtay).","Comience con su trabajo más reciente. Indique los últimos 3 años (más si manejó camión)."],"Employer":["Shaqo-bixiye","Empleador"],"Company":["Shirkadda","Empresa"],"Your position":["Jagadaada","Su puesto"],"Company phone":["Taleefanka shirkadda","Teléfono de la empresa"],"From":["Laga bilaabo","Desde"],"To":["Ilaa","Hasta"],"Reason for leaving":["Sababta aad uga tagtay","Motivo de salida"],"Remove":["Ka saar","Quitar"],"+ Add another employer":["+ Ku dar shaqo-bixiye kale","+ Agregar otro empleador"],"Position":["Jagada","Puesto"],"Local driver":["Darawal maxalli ah","Conductor local"],"Regional driver":["Darawal gobol","Conductor regional"],"Over-the-road driver":["Darawal fogaan dheer","Conductor de larga distancia"],"Any":["Mid kasta","Cualquiera"],"Can start":["Waan bilaabi karaa","Puede empezar"],"Driving record":["Diiwaanka wadista","Historial de manejo"],"Any accidents in the last 3 years?":["Ma jirtay shilal 3-dii sano ee la soo dhaafay?","¿Algún accidente en los últimos 3 años?"],"Any traffic violations in the last 3 years?":["Ma jirtay xad-gudub taraafiko 3-dii sano ee la soo dhaafay?","¿Alguna infracción de tránsito en los últimos 3 años?"],"Has your license ever been suspended, denied or revoked?":["Shatigaaga weligiis ma la hakiyay, ma la diiday, mise ma la burburiyay?","¿Alguna vez le han suspendido, negado o revocado la licencia?"],"Can you pass a DOT physical and drug screen?":["Ma ku gudbi kartaa baaritaanka jidhka DOT iyo baaritaanka daroogada?","¿Puede pasar un examen físico DOT y una prueba de drogas?"],"Review & sign":["Dib u eeg oo saxiix","Revisar y firmar"],"I certify that everything in this application is true and complete. I understand a false answer can disqualify me or end my employment. I authorize Bashka Express LLC to contact my previous employers and to check my driving record, as allowed by law (including 49 CFR Part 391), in order to review my application.":["Waxaan caddeynayaa in wax kasta oo ku jira codsigan ay run yihiin oo dhammaystiran yihiin. Waan fahamsanahay in jawaab been ah ay iga masaafurin karto ama ay shaqadayda soo afjari karto. Waxaan ogolaanayaa in Bashka Express LLC la xiriirto shaqo-bixiyayaashaydii hore oo ay hubiso diiwaanka wadistayda, sida sharcigu oggol yahay (oo ay ku jirto 49 CFR Part 391), si ay u dib-eegto codsigayga.","Certifico que todo lo que aparece en esta solicitud es verdadero y completo. Entiendo que una respuesta falsa puede descalificarme o terminar mi empleo. Autorizo a Bashka Express LLC a contactar a mis empleadores anteriores y a revisar mi historial de manejo, según lo permita la ley (incluido 49 CFR Parte 391), para evaluar mi solicitud."],"Type your full legal name":["Qor magacaaga buuxa ee sharciga ah","Escriba su nombre legal completo"],"Sign with your finger":["Ku saxiix farta","Firme con el dedo"],"Clear signature":["Tirtir saxiixa","Borrar firma"],"I agree to the statement above":["Waan ku raacsanahay hadalka kor ku qoran","Estoy de acuerdo con la declaración anterior"],"Back":["Dib","Atrás"],"Next":["Xiga","Siguiente"],"Submit application":["Dir codsiga","Enviar solicitud"],"Sending…":["Waa la dirayaa…","Enviando…"],"Application received":["Codsiga waa la helay","Solicitud recibida"],"Thank you! Bashka Express will review your application and contact you by phone or email.":["Mahadsanid! Bashka Express waxay dib u eegi doontaa codsigaaga waxayna kula soo xiriiri doontaa taleefan ama iimayl.","¡Gracias! Bashka Express revisará su solicitud y se pondrá en contacto por teléfono o correo electrónico."],"Step":["Tallaabo","Paso"],"of":["ee","de"],"License":["Shatiga","Licencia"],"Sign":["Saxiix","Firmar"],"Please fill in the highlighted field.":["Fadlan buuxi goobta la calaamadeeyay.","Complete el campo resaltado."],"Please enter a valid email.":["Fadlan geli iimayl sax ah.","Ingrese un correo válido."],"Please enter a valid phone number.":["Fadlan geli lambar taleefan oo sax ah.","Ingrese un número de teléfono válido."],"Please answer the work authorization question.":["Fadlan jawaab su'aasha ogolaanshaha shaqada.","Responda la pregunta sobre autorización de trabajo."],"Please answer every question on this page.":["Fadlan jawaab su'aal kasta oo bogga ku jirta.","Responda todas las preguntas de esta página."],"Please sign in the box.":["Fadlan ku saxiix sanduuqa.","Firme en el recuadro."],"Please tick the box to agree.":["Fadlan calaamadee sanduuqa si aad ugu raacdo.","Marque la casilla para aceptar."],"We could not read that photo. You can skip it and bring your license to the interview.":["Sawirkaas lama akhriyi karin. Waad ka boodi kartaa oo shatigaaga la timaad wareysiga.","No pudimos leer esa foto. Puede omitirla y llevar su licencia a la entrevista."],"Sorry, we could not send your application. Please check your connection and try again, or call us.":["Waan ka xumahay, codsigaaga lama diri karin. Fadlan hubi isku-xirkaaga oo mar kale isku day, ama nagu soo wac.","Lo sentimos, no pudimos enviar su solicitud. Revise su conexión e inténtelo de nuevo, o llámenos."],"e.g. 3":["tus. 3","p. ej. 3"],"e.g. 5":["tus. 5","p. ej. 5"],"Street, city, state, ZIP":["Waddo, magaalo, gobol, ZIP","Calle, ciudad, estado, ZIP"],"e.g. H, N, T, X — or none":["tus. H, N, T, X — ama midna","p. ej. H, N, T, X — o ninguno"],"Date, location, what happened, any injuries":["Taariikh, goob, maxaa dhacay, dhaawac kasta","Fecha, lugar, qué pasó, lesiones"],"Date, violation, state":["Taariikh, xad-gudub, gobol","Fecha, infracción, estado"],"Please explain":["Fadlan sharax","Por favor explique"]};
+let LANG='en';try{const sv=localStorage.getItem('bx_lang');if(sv==='so'||sv==='es')LANG=sv}catch(e){}
+const tr=s=>LANG==='en'?s:((D[s]&&D[s][LANG==='so'?0:1])||s);
+const SKIP='#stepname,#next,#err,script,style,.hp';
+function applyLang(root){
+  root=root||document.querySelector('.wrap');
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;const nodes=[];
+  while(n=w.nextNode())nodes.push(n);
+  nodes.forEach(n=>{
+    if(n.parentElement.closest(SKIP))return;
+    if(n.__o===undefined)n.__o=n.nodeValue;
+    const m=n.__o.match(/^(\s*)([\s\S]*?)(\s*)$/);
+    if(m[2])n.nodeValue=m[1]+tr(m[2])+m[3];
+  });
+  root.querySelectorAll('[placeholder]').forEach(e=>{if(e.__p===undefined)e.__p=e.getAttribute('placeholder');e.setAttribute('placeholder',tr(e.__p))});
+  document.querySelectorAll('.emp h3 span:first-child').forEach((x,i)=>x.textContent=tr('Employer')+' '+(i+1));
+  document.documentElement.lang=LANG==='en'?'en':LANG;
+}
+function setLang(l){LANG=l;try{localStorage.setItem('bx_lang',l)}catch(e){}
+  document.querySelectorAll('#lang button').forEach(b=>b.classList.toggle('on',b.dataset.l===l));
+  applyLang();show(cur,true)}
+document.querySelectorAll('#lang button').forEach(b=>b.onclick=()=>setLang(b.dataset.l));
+
+function show(n,keepScroll){
   cur=n;steps.forEach((s,i)=>s.classList.toggle('on',i===n));
   [...$('prog').children].forEach((b,i)=>b.classList.toggle('on',i<=n));
-  $('stepname').textContent='Step '+(n+1)+' of '+steps.length+' · '+steps[n].dataset.name;
+  $('stepname').textContent=tr('Step')+' '+(n+1)+' '+tr('of')+' '+steps.length+' · '+tr(steps[n].dataset.name);
   $('back').style.display=n?'':'none';
-  $('next').textContent=n===steps.length-1?'Submit application':'Next';
-  $('err').style.display='none';window.scrollTo({top:0,behavior:'smooth'});
+  $('next').textContent=tr(n===steps.length-1?'Submit application':'Next');
+  $('err').style.display='none';if(!keepScroll)window.scrollTo({top:0,behavior:'smooth'});
   if(n===steps.length-1)sizeCanvas();
 }
-function fail(msg,el){$('err').textContent=msg;$('err').style.display='block';if(el){el.classList.add('bad');el.scrollIntoView({block:'center',behavior:'smooth'});el.focus&&el.focus();}}
+function fail(msg,el){$('err').textContent=tr(msg);$('err').style.display='block';if(el){el.classList.add('bad');el.scrollIntoView({block:'center',behavior:'smooth'});el.focus&&el.focus();}}
 
 // Yes/No buttons
 document.querySelectorAll('.yn').forEach(g=>{
@@ -181,15 +208,15 @@ const yn=k=>{const e=document.querySelector('input[name="'+k+'"]:checked');retur
 function addEmp(){
   const n=$('emps').children.length+1;
   const d=document.createElement('div');d.className='emp';
-  d.innerHTML='<h3><span>Employer '+n+'</span>'+(n>1?'<button type="button" class="link rm">Remove</button>':'')+'</h3><div class="grid">'+
+  d.innerHTML='<h3><span>'+tr('Employer')+' '+n+'</span>'+(n>1?'<button type="button" class="link rm">'+tr('Remove')+'</button>':'')+'</h3><div class="grid">'+
   '<div class="f full"><label class="l">Company</label><input data-f="employer"></div>'+
   '<div class="f"><label class="l">Your position</label><input data-f="position"></div>'+
   '<div class="f"><label class="l">Company phone</label><input data-f="phone" type="tel" inputmode="tel"></div>'+
   '<div class="f"><label class="l">From</label><input data-f="start_date" type="month"></div>'+
   '<div class="f"><label class="l">To</label><input data-f="end_date" type="month"></div>'+
   '<div class="f full"><label class="l">Reason for leaving</label><input data-f="reason"></div></div>';
-  const rm=d.querySelector('.rm');if(rm)rm.onclick=()=>{d.remove();[...$('emps').children].forEach((c,i)=>c.querySelector('h3 span').textContent='Employer '+(i+1))};
-  $('emps').appendChild(d);
+  const rm=d.querySelector('.rm');if(rm)rm.onclick=()=>{d.remove();[...$('emps').children].forEach((c,i)=>c.querySelector('h3 span').textContent=tr('Employer')+' '+(i+1))};
+  $('emps').appendChild(d);applyLang(d);
 }
 $('addEmp').onclick=addEmp;addEmp();
 const emps=()=>[...$('emps').children].map(d=>{const o={};d.querySelectorAll('[data-f]').forEach(i=>o[i.dataset.f]=i.value.trim());return o}).filter(o=>o.employer);
@@ -257,10 +284,10 @@ $('next').onclick=async()=>{
   if(!validate(cur))return;
   if(cur<steps.length-1){show(cur+1);return}
   if($('website').value)return; // bot trap
-  const btn=$('next');btn.disabled=true;btn.textContent='Sending…';$('err').style.display='none';
+  const btn=$('next');btn.disabled=true;btn.textContent=tr('Sending…');$('err').style.display='none';
   try{
     const dl=await upload('dl','license'),med=await upload('med','medical');
-    const p={id:subId,full_name:$('full_name').value.trim(),phone:$('phone').value.trim(),email:$('email').value.trim(),
+    const p={id:subId,language:LANG,full_name:$('full_name').value.trim(),phone:$('phone').value.trim(),email:$('email').value.trim(),
       date_of_birth:$('date_of_birth').value||null,address:$('address').value.trim(),years_at_address:$('years_at_address').value.trim()||null,
       work_eligible:yn('work_eligible')==='yes',license_number:$('license_number').value.trim(),license_state:$('license_state').value.trim().toUpperCase(),
       license_expiration:$('license_expiration').value||null,cdl_class:$('cdl_class').value||null,endorsements:$('endorsements').value.trim()||null,
@@ -275,10 +302,10 @@ $('next').onclick=async()=>{
     if(!r.ok)throw new Error(await r.text());
     $('app').style.display='none';$('done').style.display='block';$('prog').style.display='none';$('stepname').textContent='Done';window.scrollTo({top:0});
   }catch(e){
-    console.error(e);btn.disabled=false;btn.textContent='Submit application';
+    console.error(e);btn.disabled=false;btn.textContent=tr('Submit application');
     fail('Sorry, we could not send your application. Please check your connection and try again, or call us.');
   }
 };
-show(0);
+applyLang();document.querySelectorAll('#lang button').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG));show(0,true);
 </script>
 </body></html>
