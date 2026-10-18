@@ -8,11 +8,11 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#080b10;--card:#111620;--card-2:#151b28;--line:#232c3d;
-  --ink:#e8edf8;--ink-soft:#8b96b8;
-  --amber:#e8a020;--amber-dark:#c8850f;
-  --green:#3ddc84;--red:#ff6b6b;
-  --radius:8px;
+--bg:#080b10;--card:#111620;--card-2:#151b28;--line:#232c3d;
+--ink:#e8edf8;--ink-soft:#8b96b8;
+--amber:#e8a020;--amber-dark:#c8850f;
+--green:#3ddc84;--red:#ff6b6b;
+--radius:8px;
 }
 body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;min-height:100vh;padding:20px}
 .wrap{max-width:640px;margin:0 auto}
@@ -38,65 +38,197 @@ body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;background:var(--b
 .success-screen{text-align:center;padding:60px 24px}
 .success-icon{font-size:48px;margin-bottom:16px}
 .required::after{content:" *";color:var(--red)}
+
+/* Photo upload styles */
+.photo-upload-box{
+  background:var(--card-2);border:2px dashed var(--line);border-radius:var(--radius);
+  padding:16px 12px;text-align:center;cursor:pointer;transition:border-color 0.2s;
+  position:relative;overflow:hidden;
+}
+.photo-upload-box:hover,.photo-upload-box.drag-over{border-color:var(--amber)}
+.photo-upload-box input[type=file]{
+  position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;
+}
+.photo-upload-box .upload-icon{font-size:24px;margin-bottom:6px}
+.photo-upload-box .upload-label{font-size:12px;color:var(--ink-soft)}
+.photo-upload-box .upload-label span{color:var(--amber);font-weight:600}
+.photo-upload-box .upload-sub{font-size:10px;color:var(--ink-soft);margin-top:3px}
+.photo-preview{
+  width:100%;max-height:160px;object-fit:cover;border-radius:var(--radius);
+  margin-top:8px;display:none;border:1px solid var(--line);
+}
+.upload-status{font-size:11px;margin-top:6px;display:none}
+.upload-status.ok{color:var(--green)}
+.upload-status.err{color:var(--red)}
+.upload-progress{
+  height:3px;background:var(--line);border-radius:2px;margin-top:6px;display:none;
+}
+.upload-progress-bar{height:100%;background:var(--amber);border-radius:2px;width:0%;transition:width 0.3s}
+
 @media(max-width:520px){.form-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="header">
-    <h1>🚛 Bashka Express — Driver Information</h1>
-    <p>Please fill in your details below so we can complete your driver profile</p>
+<div class="header">
+<h1>🚛 Bashka Express — Driver Information</h1>
+<p>Please fill in your details below so we can complete your driver profile</p>
+</div>
+<div class="card" id="form-card">
+<form id="info-form">
+
+<div class="section">
+<div class="section-title">Your information</div>
+<div class="form-grid">
+<div class="form-group full"><label class="form-label required">Full name</label><input class="form-input" id="f-name" required></div>
+<div class="form-group"><label class="form-label required">Phone</label><input class="form-input" id="f-phone" type="tel" placeholder="(651) 555-0100" required></div>
+<div class="form-group"><label class="form-label">Email</label><input class="form-input" id="f-email" type="email" placeholder="you@example.com"><div class="hint">Used for your driver portal login</div></div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">Driver's license</div>
+<div class="form-grid">
+<div class="form-group"><label class="form-label required">License number</label><input class="form-input" id="f-license" required></div>
+<div class="form-group"><label class="form-label required">License state</label><input class="form-input" id="f-license-state" maxlength="2" placeholder="e.g. MN" required></div>
+<div class="form-group"><label class="form-label">Expiration date</label><input class="form-input" id="f-license-exp" type="date"></div>
+<div class="form-group"><label class="form-label">Class / endorsements</label><input class="form-input" id="f-cdl" placeholder="e.g. Class A"></div>
+</div>
+<!-- DL Photo upload -->
+<div class="form-group full" style="margin-top:4px">
+  <label class="form-label">Photo of driver's license <span style="color:var(--ink-soft);text-transform:none;font-size:10px">(front side)</span></label>
+  <div class="photo-upload-box" id="dl-box">
+    <input type="file" id="f-dl-photo" accept="image/*" capture="environment">
+    <div class="upload-icon">📷</div>
+    <div class="upload-label">Tap to take a photo or <span>choose from gallery</span></div>
+    <div class="upload-sub">JPG, PNG — max 10 MB</div>
+    <img class="photo-preview" id="dl-preview" alt="DL preview">
+    <div class="upload-progress" id="dl-progress"><div class="upload-progress-bar" id="dl-bar"></div></div>
+    <div class="upload-status" id="dl-status"></div>
   </div>
-  <div class="card" id="form-card">
-    <form id="info-form">
+</div>
+</div>
 
-      <div class="section">
-        <div class="section-title">Your information</div>
-        <div class="form-grid">
-          <div class="form-group full"><label class="form-label required">Full name</label><input class="form-input" id="f-name" required></div>
-          <div class="form-group"><label class="form-label required">Phone</label><input class="form-input" id="f-phone" type="tel" placeholder="(651) 555-0100" required></div>
-          <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="f-email" type="email" placeholder="you@example.com"><div class="hint">Used for your driver portal login</div></div>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">Driver's license</div>
-        <div class="form-grid">
-          <div class="form-group"><label class="form-label required">License number</label><input class="form-input" id="f-license" required></div>
-          <div class="form-group"><label class="form-label required">License state</label><input class="form-input" id="f-license-state" maxlength="2" placeholder="e.g. MN" required></div>
-          <div class="form-group"><label class="form-label">Expiration date</label><input class="form-input" id="f-license-exp" type="date"></div>
-          <div class="form-group"><label class="form-label">Class / endorsements</label><input class="form-input" id="f-cdl" placeholder="e.g. Class A"></div>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">Emergency contact</div>
-        <div class="form-grid">
-          <div class="form-group full"><label class="form-label">Contact name</label><input class="form-input" id="f-ec-name"></div>
-          <div class="form-group"><label class="form-label">Relationship</label><input class="form-input" id="f-ec-rel" placeholder="e.g. Spouse"></div>
-          <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="f-ec-phone" type="tel"></div>
-        </div>
-      </div>
-
-      <div class="consent">
-        By submitting, you confirm this information is accurate to the best of your knowledge. It will be added to your driver profile at Bashka Express LLC.
-      </div>
-
-      <div class="error" id="form-error"></div>
-      <button type="submit" class="btn-submit" id="submit-btn">Submit</button>
-    </form>
-
-    <div id="success-screen" class="success-screen" style="display:none">
-      <div class="success-icon">✅</div>
-      <h2>Thank you!</h2>
-      <p style="color:var(--ink-soft);margin-top:8px">Your information has been received and will be added to your driver profile.</p>
-    </div>
+<div class="section">
+<div class="section-title">DOT Medical card</div>
+<div class="form-grid">
+<div class="form-group"><label class="form-label">Medical card expiration</label><input class="form-input" id="f-med-exp" type="date"></div>
+</div>
+<!-- Medical card photo upload -->
+<div class="form-group full" style="margin-top:4px">
+  <label class="form-label">Photo of DOT medical card</label>
+  <div class="photo-upload-box" id="med-box">
+    <input type="file" id="f-med-photo" accept="image/*" capture="environment">
+    <div class="upload-icon">🏥</div>
+    <div class="upload-label">Tap to take a photo or <span>choose from gallery</span></div>
+    <div class="upload-sub">JPG, PNG — max 10 MB</div>
+    <img class="photo-preview" id="med-preview" alt="Medical card preview">
+    <div class="upload-progress" id="med-progress"><div class="upload-progress-bar" id="med-bar"></div></div>
+    <div class="upload-status" id="med-status"></div>
   </div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">Emergency contact</div>
+<div class="form-grid">
+<div class="form-group full"><label class="form-label">Contact name</label><input class="form-input" id="f-ec-name"></div>
+<div class="form-group"><label class="form-label">Relationship</label><input class="form-input" id="f-ec-rel" placeholder="e.g. Spouse"></div>
+<div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="f-ec-phone" type="tel"></div>
+</div>
+</div>
+
+<div class="consent">
+By submitting, you confirm this information is accurate to the best of your knowledge. It will be added to your driver profile at Bashka Express LLC.
+</div>
+
+<div class="error" id="form-error"></div>
+<button type="submit" class="btn-submit" id="submit-btn">Submit</button>
+</form>
+
+<div id="success-screen" class="success-screen" style="display:none">
+<div class="success-icon">✅</div>
+<h2>Thank you!</h2>
+<p style="color:var(--ink-soft);margin-top:8px">Your information has been received and will be added to your driver profile.</p>
+</div>
+</div>
 </div>
 
 <script>
 const SB_URL = 'https://ghrbrwusfyjprxhivxfo.supabase.co';
 const SB_KEY = 'sb_publishable_NAFw4krk8evjh7Bx0VFD9g_EcuThMES';
+
+// Track uploaded file paths
+let dlPhotoPath = null;
+let medPhotoPath = null;
+
+// Photo preview + upload on file select
+function setupPhotoUpload(inputId, previewId, boxId, progressId, barId, statusId, folder) {
+  const input = document.getElementById(inputId);
+  const preview = document.getElementById(previewId);
+  const progress = document.getElementById(progressId);
+  const bar = document.getElementById(barId);
+  const status = document.getElementById(statusId);
+
+  input.addEventListener('change', async () => {
+    const file = input.files[0];
+    if (!file) return;
+
+    // Show local preview immediately
+    const reader = new FileReader();
+    reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; };
+    reader.readAsDataURL(file);
+
+    // Upload to Supabase Storage
+    const ext = file.name.split('.').pop() || 'jpg';
+    const ts = Date.now();
+    const path = `${folder}/${ts}.${ext}`;
+
+    progress.style.display = 'block';
+    bar.style.width = '30%';
+    status.style.display = 'none';
+
+    try {
+      // Use XHR to track progress
+      await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${SB_URL}/storage/v1/object/driver-documents/${path}`);
+        xhr.setRequestHeader('apikey', SB_KEY);
+        xhr.setRequestHeader('Authorization', 'Bearer ' + SB_KEY);
+        xhr.setRequestHeader('Content-Type', file.type || 'image/jpeg');
+        xhr.upload.onprogress = e => {
+          if (e.lengthComputable) bar.style.width = Math.round(e.loaded / e.total * 90) + '%';
+        };
+        xhr.onload = () => {
+          if (xhr.status === 200 || xhr.status === 201) resolve();
+          else reject(new Error('Upload failed: ' + xhr.status + ' ' + xhr.responseText));
+        };
+        xhr.onerror = () => reject(new Error('Network error'));
+        xhr.send(file);
+      });
+
+      bar.style.width = '100%';
+      status.textContent = '✓ Uploaded';
+      status.className = 'upload-status ok';
+      status.style.display = 'block';
+
+      // Store path for form submission
+      if (folder === 'dl') dlPhotoPath = path;
+      else medPhotoPath = path;
+
+    } catch(err) {
+      status.textContent = '⚠ Upload failed — photo will be skipped';
+      status.className = 'upload-status err';
+      status.style.display = 'block';
+      console.error(err);
+    }
+
+    setTimeout(() => { progress.style.display = 'none'; }, 600);
+  });
+}
+
+setupPhotoUpload('f-dl-photo',  'dl-preview',  'dl-box',  'dl-progress',  'dl-bar',  'dl-status',  'dl');
+setupPhotoUpload('f-med-photo', 'med-preview', 'med-box', 'med-progress', 'med-bar', 'med-status', 'medical');
 
 document.getElementById('info-form').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -122,6 +254,9 @@ document.getElementById('info-form').addEventListener('submit', async (e) => {
     license_state,
     license_expiration: document.getElementById('f-license-exp').value || null,
     cdl_class: document.getElementById('f-cdl').value.trim() || null,
+    medical_card_expiration: document.getElementById('f-med-exp').value || null,
+    dl_photo_path: dlPhotoPath,
+    medical_card_photo_path: medPhotoPath,
     emergency_contact_name: document.getElementById('f-ec-name').value.trim() || null,
     emergency_contact_relationship: document.getElementById('f-ec-rel').value.trim() || null,
     emergency_contact_phone: document.getElementById('f-ec-phone').value.trim() || null
@@ -153,3 +288,4 @@ document.getElementById('info-form').addEventListener('submit', async (e) => {
 });
 </script>
 </body></html>
+
